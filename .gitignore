@@ -2,3 +2,4 @@ logs/jmeter.*
 runs/*
 moodledata/*
 moodle/*
+resources/*
