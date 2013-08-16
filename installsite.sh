@@ -20,7 +20,7 @@ load_properties
 
 # Download or update Moodle and moosh.
 if [ ! -d "moodle" ]; then
-    git clone git://github.com/moodle/moodle.git moodle
+    git clone $moodlerepo moodle
 else
     cd moodle
     git fetch origin
