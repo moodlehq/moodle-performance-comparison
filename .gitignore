@@ -1,6 +1,5 @@
-logs/jmeter.*
+logs/jmeter_*
 runs/*
 moodledata/*
 moodle/*
-resources/*
-testplans/*
+testplandata/*
