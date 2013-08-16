@@ -18,9 +18,21 @@
 # Load properties
 load_properties
 
-# Download Moodle and moosh.
-git clone git://github.com/moodle/moodle.git moodle
-git clone git://github.com/dmonllao/moosh.git moodle/moosh
+# Download or update Moodle and moosh.
+if [ ! -d "moodle" ]; then
+    git clone git://github.com/moodle/moodle.git moodle
+else
+    cd moodle
+    git fetch origin
+    cd ../
+fi
+if [ ! -d "moodle/moosh" ]; then
+    git clone git://github.com/dmonllao/moosh.git moodle/moosh
+else
+    cd moodle/moosh
+    git fetch origin
+    cd ../../
+fi
 
 # Create a Moodle config.php from the defined site properties.
 replacements="%%dbtype%%#$dbtype
@@ -47,11 +59,20 @@ if [ "$permissionsexitcode" -ne "0" ] ; then
 fi
 chmod 755 moodle/config.php
 
+# Creating moodledata directory.
+if [ -d "moodledata" ]; then
+    # TODO: Point to a drop.sh script as soon as is available.
+    echo "Error: Site already installed, truncate the database and delete moodledata/ to reinstall it."
+    exit 1
+fi
+mkdir -m 777 "moodledata"
+
 # Move to moodle site dir.
 cd moodle
 
-# Checkout the specified branch.
+# Checkout the specified branch and rebase in case is not the first install.
 git checkout $branch
+git rebase origin/$branch
 branchexitcode=$?
 if [ "$branchexitcode" -ne "0" ] ; then
     echo "Error: The specified branch does not exist, check your config.properties file."
@@ -59,20 +80,21 @@ if [ "$branchexitcode" -ne "0" ] ; then
 fi
 
 # Run install from config.php.
-php admin/cli/install_database.php --agree-license --adminuser=$adminusername --adminpass="$adminpassword" --fullname="$sitefullname" --shortname="$siteshortname"
+php admin/cli/install_database.php --agree-license --adminuser=$adminusername --adminpass="$adminpassword" --fullname="$sitefullname" --shortname="$siteshortname" > /dev/null
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ] ; then
     echo "Error: Site can not be installed, check your config.properties values."
     exit $installexitcode
 fi
 
-# Update moosh composer dependencies
+# Update moosh composer dependencies.
 cd moosh
 curl http://getcomposer.org/installer | php
 curlexitcode=$?
 if [ "$curlexitcode" -ne "0" ] ; then
-    echo "Error: Can not download composer.phar from http://getcomposer.org/installer using curl. cd to moodle/moosh, follow http://getcomposer.org/download manually and run 'php composer.phar update'"
+    echo "Error: composer.phar can not be downloaded from http://getcomposer.org/installer using curl. cd to moodle/moosh, follow http://getcomposer.org/download steps manually and run \"php composer.phar update\""
     exit $curlexitcode
 fi
 php composer.phar update
 
+echo "Installation completed successfully"
