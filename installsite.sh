@@ -8,7 +8,7 @@
 # also clones and installs moosh to generate
 # the data.
 #
-# Usage: sh ./installsite.sh
+# Usage: cd /path/to/moodle-performance-comparison && ./installsite.sh
 #
 ##############################################
 
@@ -42,7 +42,7 @@ done
 echo "${configfilecontents}" > moodle/config.php
 permissionsexitcode=$?
 if [ "$permissionsexitcode" -ne "0" ] ; then
-    echo "Moodle's config.php can not be written, check `pwd`/moodle directory (and `pwd`/moodle/config.php if it exists) permissions"
+    echo "Error: Moodle's config.php can not be written, check `pwd`/moodle directory (and `pwd`/moodle/config.php if it exists) permissions"
     exit $permissionsexitcode
 fi
 chmod 755 moodle/config.php
@@ -54,7 +54,7 @@ cd moodle
 git checkout $branch
 branchexitcode=$?
 if [ "$branchexitcode" -ne "0" ] ; then
-    echo "The specified branch does not exist, check your config.properties file."
+    echo "Error: The specified branch does not exist, check your config.properties file."
     exit $branchexitcode
 fi
 
@@ -62,7 +62,7 @@ fi
 php admin/cli/install_database.php --agree-license --adminuser=$adminusername --adminpass="$adminpassword" --fullname="$sitefullname" --shortname="$siteshortname"
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ] ; then
-    echo "Error installing the site, check your config.properties values."
+    echo "Error: Site can not be installed, check your config.properties values."
     exit $installexitcode
 fi
 
@@ -71,7 +71,7 @@ cd moosh
 curl http://getcomposer.org/installer | php
 curlexitcode=$?
 if [ "$curlexitcode" -ne "0" ] ; then
-    echo "Error downloading composer.phar from http://getcomposer.org/installer using curl, in moodle/moosh follow http://getcomposer.org/download manually and run 'php composer.phar update'"
+    echo "Error: Can not download composer.phar from http://getcomposer.org/installer using curl. cd to moodle/moosh, follow http://getcomposer.org/download manually and run 'php composer.phar update'"
     exit $curlexitcode
 fi
 php composer.phar update
