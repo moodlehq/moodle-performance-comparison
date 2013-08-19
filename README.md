@@ -1,5 +1,7 @@
 Set of shell scripts to run Moodle performance tests using different hardwares and configurations and compare results.
 
+WARNING: Work in progress!! I only pushed it to upstream to prevent losing code.
+
 ## Requirements
 * JMeter - http://jmeter.apache.org/
 
@@ -27,6 +29,7 @@ Set of shell scripts to run Moodle performance tests using different hardwares a
     + http://localhost/moodle-performance-comparison/results.php (change to your URL according to config.properties)
 
 ## TODO
+* Remove WARNING
 * Before sharing: *mv config.properties config.properties.dist*.
 * Add info in the commands --help.
 * Move dmonllao/moosh.git to moodlehq/moosh.git if we add/modify commands.
