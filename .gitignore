@@ -3,3 +3,4 @@ runs/*
 moodledata/*
 moodle/*
 testplandata/*
+config.properties
