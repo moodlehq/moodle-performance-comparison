@@ -45,7 +45,7 @@ replacements="%%dbtype%%#$dbtype
 %%dataroot%%#$PWD/moodledata"
 
 # Replace values from the config template.
-configfilecontents="$( cat ./config.php.template )"
+configfilecontents="$( cat ./templates/config.php.template )"
 for i in ${replacements}; do
     configfilecontents=$( echo "${configfilecontents}" | sed "s#${i}#g" )
 done
@@ -80,7 +80,7 @@ if [ "$branchexitcode" -ne "0" ] ; then
 fi
 
 # Run install from config.php.
-php admin/cli/install_database.php --agree-license --adminuser=$adminusername --adminpass="$adminpassword" --fullname="$sitefullname" --shortname="$siteshortname" > /dev/null
+php admin/cli/install_database.php --agree-license --adminuser="$adminusername" --adminpass="$adminpassword" --fullname="$sitefullname" --shortname="$siteshortname"
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ] ; then
     echo "Error: Site can not be installed, check your config.properties values."
@@ -97,4 +97,5 @@ if [ "$curlexitcode" -ne "0" ] ; then
 fi
 php composer.phar update
 
+echo ""
 echo "Installation completed successfully"
