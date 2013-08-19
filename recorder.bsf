@@ -1,0 +1,163 @@
+import java.io.*;
+import java.util.regex.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.jmeter.util.JMeterUtils;      // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/util/JMeterUtils.html
+import org.apache.jmeter.threads.JMeterContext; // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/threads/JMeterContext.html
+import org.apache.jmeter.samplers.SampleResult; // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/samplers/SampleResult.html
+
+MoodleResult(JMeterContext ctx) {
+
+    Integer thread = ctx.getThreadNum();
+    SampleResult result = ctx.getPreviousResult();
+
+    String html = result.getResponseDataAsString();
+
+    String dbreads = "0";
+    Pattern pdbreads = Pattern.compile(".*?DB reads/writes: (\\d+)/\\d+.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mdbreads = pdbreads.matcher(html);
+    if (mdbreads.matches()) {
+        dbreads = mdbreads.group(1);
+    }
+
+    String dbwrites = "0";
+    Pattern pdbwrites = Pattern.compile(".*?DB reads/writes: \\d+/(\\d+).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mdbwrites = pdbwrites.matcher(html);
+    if (mdbwrites.matches()) {
+        dbwrites = mdbwrites.group(1);
+    }
+
+    String memoryused = "0";
+    Pattern pmemoryused = Pattern.compile(".*?RAM: (\\d+(\\.\\d+)?)MB.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mmemoryused = pmemoryused.matcher(html);
+    if (mmemoryused.matches()) {
+        memoryused = mmemoryused.group(1);
+    }
+
+    String filesincluded = "0";
+    Pattern pfilesincluded = Pattern.compile(".*?Included (\\d+) files.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mfilesincluded = pfilesincluded.matcher(html);
+    if (mfilesincluded.matches()) {
+        filesincluded = mfilesincluded.group(1);
+    }
+
+    String serverload = "0";
+    Pattern pserverload = Pattern.compile(".*?Load average: (\\d+(\\.\\d+)?).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mserverload = pserverload.matcher(html);
+    if (mserverload.matches()) {
+        serverload = mserverload.group(1);
+    }
+
+    String sessionsize = "0";
+    Pattern psessionsize = Pattern.compile(".*?Session: (\\d+(\\.\\d+)?[A-Z]{2}).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher msessionsize = psessionsize.matcher(html);
+    if (msessionsize.matches()) {
+        sessionsize = msessionsize.group(1);
+    }
+
+    String timeused = "0";
+    Pattern ptimeused = Pattern.compile(".*?\"timeused\">(\\d+(\\.\\d+)?) secs.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Matcher mtimeused = ptimeused.matcher(html);
+    if (mtimeused.matches()) {
+        timeused = mtimeused.group(1);
+    }
+
+    // Actual information collected about the sample by jmeter
+    String username = vars.get("username");
+    String name = StringUtils.rightPad(result.getSampleLabel(), 30);
+    String url = result.getUrlAsString();
+    Integer bytes = result.getBytes();
+    Long time = result.getTime();
+    Long latency = result.getLatency();
+    Long starttime = result.getStartTime();
+    String status = result.getResponseCode();
+
+    headerToString() {
+        String str = "status | thread | ";
+        str += StringUtils.rightPad("user", 10) + " | ";
+        str += StringUtils.rightPad("name", 30) + " | db-r | db-w | ";
+        str += StringUtils.rightPad("memory", 8) + " | ";
+        str += StringUtils.rightPad("files", 6) + " | ";
+        str += StringUtils.rightPad("load", 6) + " |";
+        return str;
+    }
+
+    toString() {
+        String str = StringUtils.rightPad(status, 6) + " | ";
+        str += StringUtils.rightPad(Integer.toString(thread), 6) + " | ";
+        str += StringUtils.rightPad(username, 10) + " | ";
+        str += StringUtils.rightPad(name, 30) + " | ";
+        str += StringUtils.rightPad(dbreads, 4) + " | ";
+        str += StringUtils.rightPad(dbwrites, 4) + " | ";
+        str += StringUtils.rightPad(memoryused, 8) + " | ";
+        str += StringUtils.rightPad(filesincluded, 6) + " | ";
+        str += StringUtils.rightPad(serverload, 6) + " | ";
+        str += url;
+        return str;
+    }
+
+    toPHP() {
+       String php = "$results["+thread+"][] = array(\n";
+       php += "    'thread'=>"+thread+",\n";        // Int
+       php += "    'starttime'=>"+starttime+",\n";      // Long
+       php += "    'dbreads'=>"+Integer.parseInt(dbreads)+",\n";    // String => Int
+       php += "    'dbwrites'=>"+Integer.parseInt(dbwrites)+",\n";  // String => Int
+       php += "    'memoryused'=>'"+memoryused+"',\n";
+       php += "    'filesincluded'=>'"+filesincluded+"',\n";
+       php += "    'serverload'=>'"+serverload+"',\n";
+       php += "    'sessionsize'=>'"+sessionsize+"',\n";
+       php += "    'timeused'=>'"+timeused+"',\n";
+       php += "    'name'=>'"+name+"',\n";
+       php += "    'url'=>'"+url+"',\n";
+       php += "    'bytes'=>'"+bytes+"',\n";
+       php += "    'time'=>'"+time+"',\n";
+       php += "    'latency'=>'"+latency+"',\n";
+       php += ");\n";
+       return php;
+    }
+
+    return this;
+}
+
+Runnable mr = MoodleResult(ctx);
+
+// Create group dir.
+String filedir = "runs/" + props.get("branch") + "/" + props.get("group");
+File groupdir = new File(filedir);
+if (!groupdir.exists()) {
+    groupdir.mkdirs();
+}
+
+// Create the file.
+String filenamepath = filedir + "/" + vars.get("RUNTIMESTAMP") + ".php";
+File f = new File(filenamepath);
+if (!f.exists()) {
+    FileWriter fstream = new FileWriter(filenamepath, true);
+    BufferedWriter out = new BufferedWriter(fstream);
+    out.write("");
+    out.close();
+
+    FileWriter fstream = new FileWriter(filenamepath, true);
+    BufferedWriter out = new BufferedWriter(fstream);
+    out.write("<?php\n");
+    out.write("$host = '"+props.get("host")+"';\n");
+    out.write("$sitepath = '"+props.get("sitepath")+"';\n");
+    out.write("$branch = '"+props.get("branch")+"';\n");
+    out.write("$group = '"+props.get("group")+"';\n");
+    out.write("$users = '"+props.get("users")+"';\n");
+    out.write("$loopcount = '"+props.get("loops")+"';\n");
+    out.write("$rundesc = '"+props.get("desc")+"';\n");
+    out.write("$rampup = '"+props.get("rampup")+"';\n");
+    out.close();
+}
+
+FileWriter fstream = new FileWriter(filenamepath, true);
+BufferedWriter out = new BufferedWriter(fstream);
+out.write(mr.toPHP());
+out.close();
+
+if (JMeterUtils.getProperty("headerprinted") == null) {
+    JMeterUtils.setProperty("headerprinted", "1");
+    print(mr.headerToString());
+}
+
+print(mr.toString());
