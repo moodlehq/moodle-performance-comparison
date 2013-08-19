@@ -21,16 +21,17 @@ WARNING: Work in progress!! I only pushed it to upstream to prevent losing code.
     + Leave debug & debugdisplay values as specified in config.php, when enabled there are more db queries
 * Generate data to populate the database
     + *./generatedata.sh {small|medium|big}*
+* Run the tests
+    + The group name should be specified to show runs results in the same graph to compare them
+    + The run description is useful to identify which settings or cache stores have been used in that run
+    + *./runtestplan.sh {run_group_name} {run_description}*
 
 ## Usage (TODO)
-* Run the tests
-    + *./runtestplan.sh {run_group_name} {run_description}*
 * Check the results
     + http://localhost/moodle-performance-comparison/results.php (change to your URL according to config.properties)
 
 ## TODO
 * Remove WARNING
-* Before sharing: *mv config.properties config.properties.dist*.
 * Add info in the commands --help.
 * Move dmonllao/moosh.git to moodlehq/moosh.git if we add/modify commands.
 * Add a reset site (or drop & install) script.
