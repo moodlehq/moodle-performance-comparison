@@ -13,6 +13,8 @@
 #
 ##############################################
 
+set -e
+
 # Useful when developing, to avoid duplicates into the database.
 COUNTERSTART=1
 
@@ -40,45 +42,35 @@ othercourses=$(eval "echo \$$(echo $1_othercourses)")
 # Move to the Moodle site.
 cd moodle
 
+# Arrays to store the created identifiers.
+createdusers=()
+createdcourses=()
+
 # Create users for the tests.
 testusers=`expr $COUNTERSTART + $testusers`
-for ((i=$COUNTERSTART; i<$testusers; i++)); do
-
-    id="$(moosh/moosh.php user-create --auth manual --password moodle testuser_$i)"
-    # All went ok, extremely optimistic no, we don't want output.
-    echo $id | egrep '^[0-9]+$'
-    if [ $? -eq 0 ]; then
-        createdusers[$i]=$id
-    fi
+for ((iuser=$COUNTERSTART; iuser<$testusers; iuser++)); do
+    create_user "testuser_$iuser"
 done
 
 # Create courses for the tests.
 testcourses=`expr $COUNTERSTART + $testcourses`
-for ((i=$COUNTERSTART; i<$testcourses; i++)); do
-
-    id="$(moosh/moosh.php course-create testcourse_$i)"
-    # All went ok, extremely optimistic no, we don't want output.
-    echo $id | egrep '^[0-9]+$'
-    if [ $? -eq 0 ]; then
-        createdcourses[$i]=$id
-    fi
+for ((icourse=$COUNTERSTART; icourse<$testcourses; icourse++)); do
+    create_course "testcourse_$icourse" "$icourse"
 done
 
 # Enrols $testusers users to $testcourses courses.
 enrol_users
 
 # Create additional users (not used in tests).
-i=`expr $testusers + 1`
-otherusers=`expr $otherusers + $i`
-for ((i=$i; i<$otherusers; i++)); do
-    moosh/moosh.php user-create --auth manual --password moodle user_$i
+otherusers=`expr $otherusers + $testusers`
+for ((iuser=$testusers; iuser<$otherusers; iuser++)); do
+    create_user "user_$iuser"
 done
 
 # Create additional courses (not used in tests).
-i=`expr $testcourses + 1`
-othercourses=`expr $othercourses + $i`
-for ((i=$i; i<$otherusers; i++)); do
-    moosh/moosh.php course-create course_$i
+othercourses=`expr $othercourses + $testcourses`
+for ((icourse=$testcourses; icourse<$otherusers; icourse++)); do
+    create_course "course_$icourse"
 done
 
 

@@ -24,6 +24,49 @@ check_size_value()
     fi
 }
 
+# Creates an user.
+create_user()
+{
+
+    # Creates the user.
+    id="$(moosh/moosh.php user-create --auth manual --password moodle $1)"
+    # All went ok, extremely optimistic no, we don't want output.
+    echo $id | egrep '^[0-9]+$'
+    if [ $? -ne 0 ]; then
+        echo "Error: Something went wrong creating '$1'"
+    fi
+
+    createdusers+=($id)
+}
+
+# Creates a course and adds resources.
+create_course()
+{
+
+    # Creates the course.
+    courseid="$(moosh/moosh.php course-create $1)"
+    # All went ok, extremely optimistic no, we don't want output.
+    echo $courseid | egrep '^[0-9]+$'
+    if [ $? -ne 0 ]; then
+        echo "Error: Something went wrong creating '$1'"
+        exit 1
+    fi
+
+    createdcourses[$2]=$courseid
+
+    # Create a few module instances.
+    modules="assign data page quiz forum label"
+    for modname in ${modules}; do
+
+        # The number of instances is specified in static.properties.
+        ninstances=$(eval "echo \$$(echo $modname)")
+        for i in `seq 1 $ninstances`; do
+            moosh/moosh.php activity-add --name "$modname $i" "$modname" "$courseid"
+        done
+    done
+
+}
+
 # Enrolls $createdusers to $createdcourses.
 enrol_users()
 {
