@@ -17,6 +17,7 @@ set -e
 
 # Useful when developing, to avoid duplicates into the database.
 COUNTERSTART=1
+TESTCOURSESUFIX="0"
 
 # Dependencies.
 . ./lib/lib.sh
@@ -34,7 +35,7 @@ check_size_value $1
 load_properties
 
 testusers=$(eval "echo \$$(echo $1_testusers)")
-testcourses=$(eval "echo \$$(echo $1_testcourses)")
+enrolcourses=$(eval "echo \$$(echo $1_enrolcourses)")
 enrolsperuser=$(eval "echo \$$(echo $1_enrolsperuser)")
 otherusers=$(eval "echo \$$(echo $1_otherusers)")
 othercourses=$(eval "echo \$$(echo $1_othercourses)")
@@ -46,6 +47,11 @@ cd moodle
 createdusers=()
 createdcourses=()
 
+# List of user's enrolments.
+enrolments=()
+
+# USERS AND COURSES WITH USER ENROLMENTS #############################
+
 # Create users for the tests.
 testusers=`expr $COUNTERSTART + $testusers`
 for ((iuser=$COUNTERSTART; iuser<$testusers; iuser++)); do
@@ -53,13 +59,28 @@ for ((iuser=$COUNTERSTART; iuser<$testusers; iuser++)); do
 done
 
 # Create courses for the tests.
-testcourses=`expr $COUNTERSTART + $testcourses`
-for ((icourse=$COUNTERSTART; icourse<$testcourses; icourse++)); do
-    create_course "testcourse_$icourse" "$icourse"
+enrolcourses=`expr $COUNTERSTART + $enrolcourses`
+for ((icourse=$COUNTERSTART; icourse<$enrolcourses; icourse++)); do
+    create_course "enrolcourse_$icourse" "$icourse"
 done
 
-# Enrols $testusers users to $testcourses courses.
-enrol_users
+# Enrols $testusers users to $enrolcourses courses.
+enrol_users_to_courses
+
+
+# MAIN COURSE ########################################################
+
+# Main test course where all users will be enrolled.
+create_course "testcourse_$TESTCOURSESUFIX"
+
+# Enrols all users to the main test course.
+for userid in "${createdusers[@]}"; do
+    # $courseid contains main course's id.
+    enrol_user_to_course
+done
+
+
+# USERS WITHOUT ENROLMENTS AND EMPTY COURSES #########################
 
 # Create additional users (not used in tests).
 otherusers=`expr $otherusers + $testusers`
@@ -68,11 +89,13 @@ for ((iuser=$testusers; iuser<$otherusers; iuser++)); do
 done
 
 # Create additional courses (not used in tests).
-othercourses=`expr $othercourses + $testcourses`
-for ((icourse=$testcourses; icourse<$otherusers; icourse++)); do
+othercourses=`expr $othercourses + $enrolcourses`
+for ((icourse=$enrolcourses; icourse<$otherusers; icourse++)); do
     create_course "course_$icourse"
 done
 
+
+# WRITTING DATA FOR THE TEST PLAN ####################################
 
 # Return to root.
 cd ..

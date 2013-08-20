@@ -68,11 +68,9 @@ create_course()
 }
 
 # Enrolls $createdusers to $createdcourses.
-enrol_users()
+enrol_users_to_courses()
 {
 
-    # To store the user-course relation.
-    enrolments=()
     ncourses="${#createdcourses[@]}"
 
     # This sounds bad.
@@ -113,18 +111,25 @@ enrol_users()
             fi
 
             # Enrolling the user.
-            moosh/moosh.php course-enrol -r student -i $courseid $userid
-
-            # Store the enrolment relation for further checking.
-            if [ -n "${enrolments[$userid]}" ]; then
-                enrolments[$userid]=${enrolments[$userid]}' '$courseid
-            else
-                enrolments[$userid]=$courseid
-            fi
+            enrol_user_to_course
 
         done
         ienrolsperuser=`expr $ienrolsperuser + 1`
     done
+}
+
+# Enrols an user to a course.
+enrol_user_to_course()
+{
+    # Enrolling the user.
+    moosh/moosh.php course-enrol -r student -i $courseid $userid
+
+    # Store the enrolment relation for further checking.
+    if [ -n "${enrolments[$userid]}" ]; then
+        enrolments[$userid]=${enrolments[$userid]}' '$courseid
+    else
+        enrolments[$userid]=$courseid
+    fi
 }
 
 # Gets the next course where $userid can be enrolled.
