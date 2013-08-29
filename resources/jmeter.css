@@ -1,0 +1,48 @@
+body {font-family:sans-serif;font-size:10pt;background-color:#333;background-image:url(gradient.png);background-repeat:repeat-x;}
+table {background-color:#FFF;width:100%;border:1px solid #999;margin-top:1em;}
+.runselector {clear:both;border:1px solid #999;margin:10px;background-color:#FFF;text-align:center;}
+.runselector form {margin:10px;}
+.runselector form label[for=after] {margin-left:2em;}
+.statistical,
+.statistical div,
+.statistical td,
+.statistical th {font-size:70%;color:#333;font:'courier new';padding:10px;}
+.statistical td,
+.statistical th {margin:0;padding:3px;border:1px solid #ddd;border-width:1px 0 0 1px;}
+.statistical .collectedstats .pagename {display:none;}
+.pagecontainer {clear:both;border:1px solid #999;margin:10px;}
+.pagecontainer.odd {background-color:#fafafa;}
+.pagecontainer.even {background-color:#fff;}
+.pagetitle {margin:8px 15px 7px;font-size:13pt;text-align:center;}
+.pagesubtitle {margin:4px 15px 7px;font-size:11pt;text-align:center;}
+.pagesubtitle a {color:#555;text-decoration:none;}
+.hidden {display:none;}
+a img {border:0;}
+
+.collectedstats {text-align:center;}
+.collectedstats .statsbox {width:90px;height:90px;display:inline-block;background-color:#EEE;border:1px solid #DDD;margin:5px;border-radius:10px;-moz-border-radius:10px;}
+.collectedstats .statsbox h3 {font-size:10pt;margin:0;padding:0;text-align:center;}
+.collectedstats .statsbox p {font-size:16pt;margin:0.5em 0;padding:0;font-weight:bold;text-align:center;}
+.collectedstats .statsbox p .perc {display:block;}
+
+.pagecontainer.statsarray .collectedstats {position:relative;text-align:left;margin:0 1em;background-color:#f6f6f6;padding:0.5em 0 0;}
+.pagecontainer.statsarray .collectedstats .pagename {position:absolute;width:15%;top:0;left:0;text-align:right;vertical-align:middle;font-size:14pt;font-weight:bold;margin-top:20px;margin-right:0.5em;}
+.pagecontainer.statsarray .collectedstats .wrapper {margin-left:15.5%;}
+.pagecontainer.statsarray .collectedstats .statsbox {height:80px;}
+.pagecontainer.statsarray .collectedstats .statsbox h3 {margin-top:5px;font-size:9pt;}
+.pagecontainer.statsarray .collectedstats .statsbox p {margin:3px;font-size:14pt;}
+.pagecontainer.statsarray .collectedstats .statsbox p .perc {display:inline;}
+
+.pagecontainer.statsarray .collectedstats[rel='Combined total properties'] {border-bottom:3px solid #666;padding-bottom:0.5em;background-color:#FFF;}
+
+#pagearray {min-width:900px;}
+#pagearray.js {margin-left:200px;position:relative;}
+#pagearray.js .pagelist {position:absolute;top:0;left:-191px;background-color:#FFF;border:1px solid #999;width:200px;border-right-color:#fff;background-color:#f6f6f6;}
+#pagearray.js .pagelist h1 {margin:7px 15px 3px;text-align:center;font-size:11pt;}
+#pagearray.js .pagelist p {margin:5px 0;padding:0 1em 0.5em 1em;font-size:80%;cursor:pointer;font-weight:bold;text-align:right;}
+#pagearray.js .pagecontainer.odd {background-color:#fff;}
+
+#lightbox {width:100%;height:100%;position:fixed;top:0;left:0;background-color:#000;opacity:0.7;z-index:10000;}
+#overlay {position:fixed;top:0;left:0;width:100%;height:100%;z-index:20000;}
+#overlay iframe {width:60%;height:600px;margin:100px 20% 0;border-color:#FFF;border-style:solid;background-color:#FFF;}
+#overlay .close {background-color:#FFF;text-align:right;color:#aaa;font-weight:bold;text-transform:uppercase;width:60%;margin:0 20%;border:2px solid #FFF;cursor:pointer;}
