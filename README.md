@@ -1,6 +1,7 @@
-Set of tools to compare Moodle test plan runs using different hardwares and configurations and compare results.
+Tools to compare Moodle test plan runs using different hardwares and configurations and compare results.
 
-WARNING: Work in progress!! I only pushed it to upstream to prevent losing code and test the Moodle test plan generation side.
+Most of the code comes from Sam Hemelryk's tool (https://github.com/samhemelryk/moodle-jmeter-perfcomp) this is an
+adaptation to run Moodle's *tool_generator* test plans.
 
 ## Requirements
 * JMeter - http://jmeter.apache.org/
