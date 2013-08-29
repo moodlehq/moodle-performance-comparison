@@ -5,35 +5,8 @@
 # these values!
 ##
 
-## Moodle repository #######################################
-
-# Moodle branch where you want to run the tests.
-branch="master"
-
-# Moodle repository, usually the official one, change it if you want to test your issues.
-moodlerepo="git://github.com/moodle/moodle.git"
-
-
-## Moodle site #############################################
-
-# Database connection data.
-dbtype="pgsql"
-dbhost="localhost"
-dbname="imadatabasename"
-dbuser="postgres"
-dbpass="postgres"
-
-# Default path proposed in README.md, change the moodle-performance-comparison
-# path according to your system without changing the /moodle sufix as is auto
-# populated by ./installsite.sh
-wwwroot=http://localhost/moodle-performance-comparison/moodle
-# TODO Auto-extract both following values from $wwwroot.
-host=localhost
-sitepath=/moodle-performance-comparison/moodle
-
-
 ## Jmeter ##################################################
 
-# Jmeter directory (/bin/jmeter will be added by runtestplan.sh).
+# Jmeter directory (/bin/jmeter will be added by testrunner.sh).
 jmeter_path=/opt/apache-jmeter-2.9
 

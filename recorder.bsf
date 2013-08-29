@@ -120,15 +120,8 @@ MoodleResult(JMeterContext ctx) {
 
 Runnable mr = MoodleResult(ctx);
 
-// Create group dir.
-String filedir = "runs/" + props.get("branch") + "/" + props.get("group");
-File groupdir = new File(filedir);
-if (!groupdir.exists()) {
-    groupdir.mkdirs();
-}
-
 // Create the file.
-String filenamepath = filedir + "/" + vars.get("RUNTIMESTAMP") + ".php";
+String filenamepath = "runs/" + vars.get("runtimestamp") + ".php";
 File f = new File(filenamepath);
 if (!f.exists()) {
     FileWriter fstream = new FileWriter(filenamepath, true);
@@ -141,11 +134,10 @@ if (!f.exists()) {
     out.write("<?php\n");
     out.write("$host = '"+props.get("host")+"';\n");
     out.write("$sitepath = '"+props.get("sitepath")+"';\n");
-    out.write("$branch = '"+props.get("branch")+"';\n");
     out.write("$group = '"+props.get("group")+"';\n");
+    out.write("$rundesc = '"+props.get("desc")+"';\n");
     out.write("$users = '"+props.get("users")+"';\n");
     out.write("$loopcount = '"+props.get("loops")+"';\n");
-    out.write("$rundesc = '"+props.get("desc")+"';\n");
     out.write("$rampup = '"+props.get("rampup")+"';\n");
     out.close();
 }

@@ -1,7 +1,4 @@
 cache/*
 logs/jmeter.*
 runs/*
-moodledata/*
-moodle/*
-testplandata/*
 config.properties
