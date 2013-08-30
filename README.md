@@ -13,7 +13,7 @@ adaptation to run Moodle's *tool_generator* test plans.
     + *cd moodle-performance-comparison*
 * Configure the tool
     + *cp config.properties.dist config.properties*
-    + Edit config.properties.dist with your own values
+    + Edit config.properties with your own values
 * Run the tests
     + Specify the paths to the files provided by Moodle's *tool_generator*
     + The group name should be specified to show runs results in the same graph to compare them (TODO)
