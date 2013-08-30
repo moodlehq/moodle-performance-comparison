@@ -7,7 +7,7 @@
 # can be compared easily. The run description
 # will be useful to identify them.
 #
-# Usage: cd /path/to/moodle-performance-comparison && ./testrunner.sh {test_plan_file_path} {users_file_path} {run_group_name} {run_description}
+# Usage: cd /path/to/moodle-performance-comparison ; ./testrunner.sh {test_plan_file_path} {users_file_path} {run_group_name} {run_description}
 #
 # Arguments:
 # * $1 => The test plan file path
