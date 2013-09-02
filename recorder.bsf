@@ -132,13 +132,13 @@ if (!f.exists()) {
     FileWriter fstream = new FileWriter(filenamepath, true);
     BufferedWriter out = new BufferedWriter(fstream);
     out.write("<?php\n");
-    out.write("$host = '"+props.get("host")+"';\n");
-    out.write("$sitepath = '"+props.get("sitepath")+"';\n");
+    out.write("$host = '"+vars.get("host")+"';\n");
+    out.write("$sitepath = '"+vars.get("sitepath")+"';\n");
     out.write("$group = '"+props.get("group")+"';\n");
     out.write("$rundesc = '"+props.get("desc")+"';\n");
-    out.write("$users = '"+props.get("users")+"';\n");
-    out.write("$loopcount = '"+props.get("loops")+"';\n");
-    out.write("$rampup = '"+props.get("rampup")+"';\n");
+    out.write("$users = '"+vars.get("users")+"';\n");
+    out.write("$loopcount = '"+vars.get("loops")+"';\n");
+    out.write("$rampup = '"+vars.get("rampup")+"';\n");
     out.close();
 }
 
