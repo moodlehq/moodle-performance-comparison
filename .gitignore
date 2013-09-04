@@ -1,4 +1,5 @@
 cache/*
 logs/jmeter.*
+runs_samples/data.*
 runs/*
 config.properties

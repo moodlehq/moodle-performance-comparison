@@ -31,7 +31,7 @@ fi
 load_properties
 
 # Uses the test plan specified in the CLI call.
-logfile=logs/jmeter.`date '+%Y%m%d_%H%M'`.log
+logfile=logs/jmeter.`date '+%Y%m%d%H%M'`.log
 
 # Run it baby! (without GUI).
 jmeterbin=$jmeter_path/bin/jmeter

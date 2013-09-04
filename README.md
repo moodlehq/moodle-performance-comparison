@@ -23,3 +23,7 @@ adaptation to run Moodle's *tool_generator* test plans.
 ## Usage
 * Check the results
     + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your checkout directory)
+
+## Troubleshooting
+* You can find jmeter logs in logs/
+* You can find runs results in runs_samples/ and the php arrays generated from them in runs/
