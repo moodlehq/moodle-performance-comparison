@@ -2,4 +2,7 @@ cache/*
 logs/jmeter.*
 runs_samples/data.*
 runs/*
-config.properties
+moodle/
+jmeter_config.properties
+webserver_config.properties
+test_files.properties
