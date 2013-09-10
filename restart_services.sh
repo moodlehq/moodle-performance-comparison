@@ -4,7 +4,10 @@
 # Restarts the services
 #
 # Not specially compatible with a wide range of server
-# settings, at least it works in linux-ubuntu.
+# settings, at least it works in linux-ubuntu. Neither
+# specially good if you have your database in another
+# server, so I would say use it only if this is a development
+# machine and you use linux.
 #
 # It restarts the services as listed in $servicesarray
 # which are defined in webserver_config.properties.
@@ -39,7 +42,9 @@ done
 
 outputinfo="
 #######################################################################
-Services restarted successfully
+Services restarted successfully.
+
+Now you can begin running the tests with test_runner.sh.
 "
 echo "$outputinfo"
 exit 0
