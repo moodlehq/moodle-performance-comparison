@@ -82,6 +82,7 @@ every time to clean up the site.
 
 ### Web and JMeter servers in the same computer (usually a development computer)
 * Generate the data and run the tests
+    + cd /path/to/moodle-performance-comparison
     + *./before_run_setup.sh {XS|S|M|L|XL|XXL}*
     + Change site settings if necessary according to what you are comparing (you can overwrite the database dump if you don't want to set it again)
     + *./restart_services.sh*
@@ -105,9 +106,24 @@ every time to clean up the site.
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
 
 ### Using your own sql dump
-* If you do this you don't need to follow steps, you know what you are doing :)
-* Detailed info reading the Moodle Docs page or the bash scripts
-
+The installation is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump and is not as easy to automate as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
+* *cd /webserver/path/to/moodle-performance-comparison*
+* Restore your dataroot
+* Restore your database
+* Generate the test plan. You need to provide the shortname of the course that will be tested
+    + *cd moodle/*
+    + *php admin/tool/generator/cli/maketestsite.php --size="THESIZEYOUWANT" --shortname="TARGETCOURSESHORTNAME" fixeddataset --bypasscheck --updateuserspassword*
+* Download the test plan and the test users. The URLs are provided by maketestsite.php in the previous step, before the performance info output begins.
+    + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/testplan_NNNNNNNNNNNN_NNNN.jmx -O testplan.jmx*
+    + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/users_NNNNNNNNNNNN_NNNN.jmx -O testusers.csv*
+* Create moodle-performance-comparison/test_files.properties
+    + *cd ../*
+    + Create a new /path/to/moodle-performance-comparison/test_files.properties file with the following content:
+        testplanfile="/absolute/path/to/testplan.jmx"
+        testusersfile="/absolute/path/to/testusers.csv"
+        datarootbackup="/absolute/path/to/the/dataroot/backup/directory"
+        databasebackup="/absolute/path/to/the/database/backup.sql"
+* Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> ....
 
 ## Security
 

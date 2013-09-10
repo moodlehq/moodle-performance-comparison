@@ -131,7 +131,7 @@ chmod $permissions config.php
 php admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" $debug
 
 # Generate courses.
-php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck > /dev/null
+php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck $debug
 
 # We capture the output to get the files we will need.
 testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${sizecourse[$1]}' --bypasscheck'$debug
