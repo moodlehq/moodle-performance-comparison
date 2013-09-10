@@ -41,6 +41,13 @@ if [ -z "$testplanfile" ] || [ -z "$testusersfile" ]; then
     exit 1
 fi
 
+# Creating the results cache directory for images.
+if [ ! -d "cache" ]; then
+    mkdir -m 777 "cache"
+else
+    chmod 777 "cache"
+fi
+
 # Load properties.
 load_properties "jmeter_config.properties"
 

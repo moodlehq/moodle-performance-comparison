@@ -116,10 +116,12 @@ The installation is the same, it also depends on if you use the same computer fo
 * Create moodle-performance-comparison/test_files.properties
     + *cd ../*
     + Create a new /path/to/moodle-performance-comparison/test_files.properties file with the following content:
-        testplanfile="/absolute/path/to/testplan.jmx"
-        testusersfile="/absolute/path/to/testusers.csv"
-        datarootbackup="/absolute/path/to/the/dataroot/backup/directory"
-        databasebackup="/absolute/path/to/the/database/backup.sql"
+
+>    testplanfile="/absolute/path/to/testplan.jmx"
+>    datarootbackup="/absolute/path/to/the/dataroot/backup/directory"
+>    testusersfile="/absolute/path/to/testusers.csv"
+>    databasebackup="/absolute/path/to/the/database/backup.sql"
+
 * Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> ....
 
 ## Security
