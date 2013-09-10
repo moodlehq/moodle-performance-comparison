@@ -379,6 +379,10 @@ function get_runs($dir = null) {
             if (preg_match("/rundesc = '([^']+)'/", $start, $matches)) {
                 $desc = $matches[1];
             }
+            $group = 'Unknown group';
+            if (preg_match("/group = '([^']+)'/", $start, $matches)) {
+                $group = $matches[1];
+            }
             $loopcount = 30;
             if (preg_match("/loopcount = '(\d+)'/", $start, $matches)) {
                 $loopcount = $matches[1];
@@ -394,6 +398,7 @@ function get_runs($dir = null) {
                 'branch' => $branch,
                 'file' => $dir.$file,
                 'desc' => $desc,
+                'group' => $group,
                 'users' => $users,
                 'loopcount' => $loopcount,
             );
@@ -415,7 +420,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($before == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[branch] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
     }
     echo "</select>";
     echo "<label for='after'>After:&nbsp;</label>";
@@ -425,7 +430,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($after == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[branch] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
     }
     echo "</select>";
     echo "<hr />";
