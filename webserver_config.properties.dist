@@ -1,0 +1,52 @@
+###############################################
+# Configure with your own values.
+# 
+# Remember to run ./before_run_setup.sh after changing
+# any of those values as everything would change and
+# previous runs would neither be valid.
+###############################################
+
+
+## Site info #################################################
+
+# All Moodle db types supported, but only 'pgsql' and 'mysqli' auto backup/restore, manual backup/restore required for other drivers, more info in before_run_setup.sh and after_run_setup.sh.
+dbtype="pgsql"
+dbhost="localhost"
+dbname="moodleperformancecomparison"
+# The user should have permissions to create and drop databases.
+dbuser="postgres"
+dbpass="yourpassword"
+dbprefix="mdl_"
+# As explained in README.md these tools are intended to be used in internal networks.
+wwwroot="http://yourwebserver/path/to/moodle-performance-comparison/moodle"
+dataroot="/your/dataroot/directory"
+toolgeneratorpassword="moodlerules"
+
+
+## Repository and test branches information ##################
+
+# The repository Moodle codebase will be pulled from.
+# Usually Moodle's public repository or your own repository if you want to test your branches.
+repository="git://github.com/moodle/moodle.git"
+
+# The original branch.
+# Usually one of Moodle's weekly released branches.
+# You can also use a git hash here.
+beforebranch="master"
+
+# The branch to compare against.
+# Usually your development branch or the same $beforebranch value if you are comparing different settings configurations.
+# You can also use a git hash here.
+afterbranch="master"
+
+
+## Others ####################################################
+
+# The database and dataroot backups will be stored here.
+# Note that this can grow a lot depending on the test sizes you use.
+backupsdir="/your/directory/with/a/lot/of/free/space"
+
+# Services names to restart before each run. 
+# Note that this will only work in a limited set of systems as it uses system calls like "service $servicename restart"
+# You will need to restart the involved services manually.
+servicesarray=( apache2 mysql postgresql )
