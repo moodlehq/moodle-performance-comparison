@@ -71,14 +71,11 @@ The installation process differs depending whether you have both the web server 
 
 ## Usage
 
-It also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load
-your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
+It also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
 
-The groupname and description arguments of test_runner.sh are useful to identify the run when comparing results, you can use it to set the branch name,
-the settings you used or whatever will help you identify which run is it
+The groupname and description arguments of test_runner.sh are useful to identify the run when comparing results, you can use it to set the branch name, the settings you used or whatever will help you identify which run is it.
 
-Note that you can run the tests as many times as you want, you just need to run after_run_setup.sh and restart_services.sh before running test_runner.sh
-every time to clean up the site.
+Note that you can run the tests as many times as you want, you just need to run after_run_setup.sh and restart_services.sh before running test_runner.sh every time to clean up the site.
 
 ### Web and JMeter servers in the same computer (usually a development computer)
 * Generate the data and run the tests
@@ -140,3 +137,4 @@ This tool in only intended to be used in development/testing environments inside
 * You can find JMeter logs in logs/
 * You can find runs results in runs_samples/ and the php arrays generated from them in runs/
 * The generated .jtl files can be big. Don't hesitate to get rid of them if you don't need them for extra analytic purposes.
+* Same with $backupsdir/ contents, if you run before_run_setup.sh many time you will have a looot of hd space wasted
