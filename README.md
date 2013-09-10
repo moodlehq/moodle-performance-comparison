@@ -137,6 +137,6 @@ This tool in only intended to be used in development/testing environments inside
 
 ## Troubleshooting
 * You can find JMeter logs in logs/
-* You can find runs results in runs_samples/ and the php arrays generated from them in runs/
+* You can find runs outputs in runs_outputs/ the results in runs_samples/ and the php arrays generated from them in runs/
 * The generated .jtl files can be big. Don't hesitate to get rid of them if you don't need them for extra analytic purposes.
 * Same with $backupsdir/ contents, if you run before_run_setup.sh many time you will have a looot of hd space wasted

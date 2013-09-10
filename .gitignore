@@ -1,6 +1,7 @@
 cache/
 logs/jmeter.*
 runs_samples/data.*
+runs_outputs/*.output
 runs/*
 moodle/
 jmeter_config.properties

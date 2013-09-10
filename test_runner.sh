@@ -52,11 +52,13 @@ fi
 load_properties "jmeter_config.properties"
 
 # Uses the test plan specified in the CLI call.
-logfile=logs/jmeter.`date '+%Y%m%d%H%M'`.log
+datestring=`date '+%Y%m%d%H%M'`
+logfile="logs/jmeter.$datestring.log"
+runoutput="runs_outputs/$datestring.output"
 
 # Run it baby! (without GUI).
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$1" -Jdesc="$2"
+$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$1" -Jdesc="$2" > $runoutput
 jmeterexitcode=$?
 if [ "$jmeterexitcode" -ne "0" ] ; then
     echo "Error: Jmeter can not run, ensure that:"
