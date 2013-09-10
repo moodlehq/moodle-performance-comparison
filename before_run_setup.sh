@@ -64,11 +64,11 @@ if [ ! -e "moodle" ]; then
 fi
 
 # Cleaning previous test plan files.
-if [ -e "moodle/users.csv" ]; then
-    rm "moodle/users.csv"
+if [ -e "$filenameusers" ]; then
+    rm "$filenameusers"
 fi
-if [ -e "moodle/testplan.jmx" ]; then
-    rm "moodle/testplan.jmx"
+if [ -e "$filenametestplan" ]; then
+    rm "$filenametestplan"
 fi
 
 
