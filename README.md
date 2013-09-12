@@ -10,7 +10,7 @@ They can be used to compare:
 * Different configurations and cache stores configurations
 * Different hardware
 * Web, database and other services tunning
-* Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump](#using-your-own-sql-dump)
+* Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump Moodle 2.6 onwards](#using-your-own-sql-dump-moodle-26-onwards) or  [Using your own sql dump (before Moodle 2.6)](#using-your-own-sql-dump-before-moodle-26)
 
 
 ## Features
@@ -102,7 +102,7 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *wget http://webserver/moodle/site/path/testusers.csv http://webserver/moodle/site/path/testplan.jmx*
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
 
-### Using your own sql dump
+### Using your own sql dump (Moodle 2.6 onwards)
 The installation is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump and is not as easy to automate as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
 * *cd /webserver/path/to/moodle-performance-comparison*
 * Restore your dataroot
@@ -118,11 +118,23 @@ The installation is the same, it also depends on if you use the same computer fo
     + Create a new /path/to/moodle-performance-comparison/test_files.properties file with the following content:
 
 >    testplanfile="/absolute/path/to/testplan.jmx"
+>
 >    datarootbackup="/absolute/path/to/the/dataroot/backup/directory"
+>
 >    testusersfile="/absolute/path/to/testusers.csv"
+>
 >    databasebackup="/absolute/path/to/the/database/backup.sql"
 
 * Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> ....
+
+### Using your own sql dump (before Moodle 2.6)
+Moodle 2.6 introduces the site and the test plan generators, so you can not use them if you are comparing previous branches. But you can
+* Use the template included in Moodle 2.6 codebase and fill the placeholders with one of your site courses info and the test plan users, loops and ramp up period
+    + The test plan template is located in *admin/tool/generator/testplan.template.jmx*
+* Fill a testusers.php with the target course data
+    + You will need to check that the test data has enough users according to the data you provided in the test plan
+* Follow [Using your own sql dump (Moodle 2.6 onwards)](#using-your-own-sql-dump-moodle-26-onwards) instructions 
+
 
 ## Security
 
