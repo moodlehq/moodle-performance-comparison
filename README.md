@@ -10,15 +10,15 @@ They can be used to compare:
 * Different configurations and cache stores configurations
 * Different hardware
 * Web, database and other services tunning
-* Also works restoring your site sql dumps rather than using the fixed generated dataset
+* Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump](#using-your-own-sql-dump)
 
 
 ## Features
 
-* Clean site installation
-* Fixed data set generation with courses, users, enrolments, module instances...
+* Clean site installation (from Moodle 2.6 onwards)
+* Fixed data set generation with courses, users, enrolments, module instances... (from Moodle 2.6 onwards)
+* JMeter test plan generation from course contents (from Moodle 2.6 onwards)
 * Web and database warm-up processes included in the test plan (results not collected)
-* JMeter test plan generation from course contents
 * JMeter runs gathering results about moodle performance data (database reads/writes, memory usage...)
 * Runs results comparison
 
