@@ -1,4 +1,4 @@
-Tools to compare Moodle sites performance.
+Tools to compare Moodle sites and/or branches performance.
 
 
 ## Purpose
@@ -44,7 +44,7 @@ The installation process differs depending whether you have both the web server 
 ### Web and JMeter servers in the same computer (usually a development computer)
 * Get the code
     + *cd /var/www* (or any other place, but accessible through a web server, not a public one please, read [security](#security) below)
-    + *git clone git://github.com/dmonllao/moodle-performance-comparison.git moodle-performance-comparison*
+    + *git clone git://github.com/moodlehq/moodle-performance-comparison.git moodle-performance-comparison*
     + *cd moodle-performance-comparison*
 * Configure the tool
     + *cp webserver_config.properties.dist webserver_config.properties*
@@ -55,11 +55,11 @@ The installation process differs depending whether you have both the web server 
 ### Web server and JMeter running from a different server
 * Get the code in the web server
     + *cd /var/www* (or any other place, but accessible through a web server, not a public one please, read [security](#Security) below)
-    + *git clone git://github.com/dmonllao/moodle-performance-comparison.git moodle-performance-comparison*
+    + *git clone git://github.com/moodlehq/moodle-performance-comparison.git moodle-performance-comparison*
     + *cd moodle-performance-comparison*
 * Get the code in the JMeter server
     + *cd /wherever/you/want*
-    + *git clone git://github.com/dmonllao/moodle-performance-comparison.git moodle-performance-comparison*
+    + *git clone git://github.com/moodlehq/moodle-performance-comparison.git moodle-performance-comparison*
     + *cd moodle-performance-comparison*
 * Configure the tool in the web server
     + *cp webserver_config.properties.dist webserver_config.properties*
