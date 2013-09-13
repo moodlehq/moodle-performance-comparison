@@ -139,6 +139,7 @@ if (!f.exists()) {
     out.write("$users = '"+vars.get("users")+"';\n");
     out.write("$loopcount = '"+vars.get("loops")+"';\n");
     out.write("$rampup = '"+vars.get("rampup")+"';\n");
+    out.write("$throughput = '"+vars.get("throughput")+"';\n");
     out.close();
 }
 

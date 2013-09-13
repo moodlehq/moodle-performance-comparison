@@ -383,13 +383,21 @@ function get_runs($dir = null) {
             if (preg_match("/group = '([^']+)'/", $start, $matches)) {
                 $group = $matches[1];
             }
-            $loopcount = 30;
+            $loopcount = "Unknown";
             if (preg_match("/loopcount = '(\d+)'/", $start, $matches)) {
                 $loopcount = $matches[1];
             }
-            $users = 10;
+            $users = "Unknown";
             if (preg_match("/users = '(\d+)'/", $start, $matches)) {
                 $users = $matches[1];
+            }
+            $rampup = "Unknown";
+            if (preg_match("/rampup = '(\d+)'/", $start, $matches)) {
+                $rampup = $matches[1];
+            }
+            $throughput = "Unknown";
+            if (preg_match("/throughput = '(\d+.\d+|\d+)'/", $start, $matches)) {
+                $throughput = $matches[1];
             }
 
             $runs[$key] = array(
@@ -401,6 +409,8 @@ function get_runs($dir = null) {
                 'group' => $group,
                 'users' => $users,
                 'loopcount' => $loopcount,
+                'rampup' => $rampup,
+                'throughput' => $throughput
             );
         }
     }
@@ -420,7 +430,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($before == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
     echo "<label for='after'>After:&nbsp;</label>";
@@ -430,7 +440,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($after == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
     echo "<hr />";
