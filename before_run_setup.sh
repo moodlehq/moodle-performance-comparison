@@ -96,12 +96,16 @@ cd moodle
 # Getting the code.
 if [ ! -e ".git" ]; then
     git clone $repository .
-    git checkout -b $beforebranch origin/$beforebranch
 else
     git fetch origin
-    git checkout $beforebranch
-    git rebase origin/$beforebranch
+    git show-ref --verify --quiet refs/heads/$beforebranch
+    if [ $? == "0" ]; then
+        # Deleting old local branch in case there are history changes so we avoid conflicts.
+        git checkout master
+        git branch -D $beforebranch 2> /dev/null
+    fi
 fi
+git checkout -b $beforebranch origin/$beforebranch
 
 # Copy config.php template and set user properties.
 replacements="%%dbtype%%#$dbtype
