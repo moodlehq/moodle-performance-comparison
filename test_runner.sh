@@ -118,10 +118,17 @@ datestring=`date '+%Y%m%d%H%M'`
 logfile="logs/jmeter.$datestring.log"
 runoutput="runs_outputs/$datestring.output"
 
+# Getting the current site.
+siteversion="$(cat moodle/version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
+sitebranch="$(cat moodle/version.php | grep '$branch' | grep -o '[0-9]\+')"
+cd moodle
+sitecommit="$(git show --oneline | head -n 1)"
+cd ..
+
 # Run it baby! (without GUI).
 echo "Test running... (time for a coffee?)"
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" $users $loops $rampup $throughput > $runoutput
+$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $users $loops $rampup $throughput > $runoutput
 jmeterexitcode=$?
 if [ "$jmeterexitcode" -ne "0" ] ; then
     echo "Error: Jmeter can not run, ensure that:"

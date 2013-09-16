@@ -374,7 +374,7 @@ function get_runs($dir = null) {
                 $branch = $matches[1];
                 $timestamp = $matches[2];
             }
-            $start = file_get_contents($dir.$file, null, null, 3, 256);
+            $start = file_get_contents($dir.$file, null, null, 3, 512);
             $desc = 'Unknown run';
             if (preg_match("/rundesc = '([^']+)'/", $start, $matches)) {
                 $desc = $matches[1];
@@ -399,6 +399,18 @@ function get_runs($dir = null) {
             if (preg_match("/throughput = '(\d+.\d+|\d+)'/", $start, $matches)) {
                 $throughput = $matches[1];
             }
+            $siteversion = "Unknown";
+            if (preg_match("/siteversion = '(\d+.\d+)'/", $start, $matches)) {
+                $siteversion = $matches[1];
+            }
+            $sitebranch = "Unknown";
+            if (preg_match("/sitebranch = '(\d+)'/", $start, $matches)) {
+                $sitebranch = $matches[1];
+            }
+            $sitecommit = "Unknown";
+            if (preg_match("/sitecommit = '([^']+)'/", $start, $matches)) {
+                $sitecommit = $matches[1];
+            }
 
             $runs[$key] = array(
                 'key' => $key,
@@ -410,7 +422,10 @@ function get_runs($dir = null) {
                 'users' => $users,
                 'loopcount' => $loopcount,
                 'rampup' => $rampup,
-                'throughput' => $throughput
+                'throughput' => $throughput,
+                'siteversion' => $siteversion,
+                'sitebranch' => $sitebranch,
+                'sitecommit' => $sitecommit
             );
         }
     }
@@ -430,7 +445,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($before == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
     echo "<label for='after'>After:&nbsp;</label>";
@@ -440,7 +455,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($after == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group] Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
     echo "<hr />";

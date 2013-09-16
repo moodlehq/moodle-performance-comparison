@@ -140,6 +140,9 @@ if (!f.exists()) {
     out.write("$loopcount = '"+vars.get("loops")+"';\n");
     out.write("$rampup = '"+vars.get("rampup")+"';\n");
     out.write("$throughput = '"+vars.get("throughput")+"';\n");
+    out.write("$siteversion = '"+props.get("siteversion")+"';\n");
+    out.write("$sitebranch = '"+props.get("sitebranch")+"';\n");
+    out.write("$sitecommit = '"+props.get("sitecommit")+"';\n");
     out.close();
 }
 
