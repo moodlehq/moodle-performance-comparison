@@ -136,6 +136,14 @@ Moodle 2.6 introduces the site and the test plan generators, so you can not use 
 * Follow [Using your own sql dump (Moodle 2.6 onwards)](#using-your-own-sql-dump-moodle-26-onwards) instructions 
 
 
+## Advanced usage
+* You can overwrite the values provided by the test plan using test_runner.sh options:
+    + -u=[users_number]
+    + -l=[loops_number]
+    + -r=[rampup_period]
+    + -t=[throughput]
+
+
 ## Security
 
 This tool in only intended to be used in development/testing environments inside the local network, it would be insecure to expose the project root in a public accessible web server, the same only exposing moodle/ directory:

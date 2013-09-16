@@ -7,13 +7,21 @@
 # can be compared easily. The run description
 # will be useful to identify them.
 #
-# Usage: cd /path/to/moodle-performance-comparison && ./test_runner.sh {run_group_name} {run_description} {test_plan_file_path} {users_file_path}
+# Usage:
+#   cd /path/to/moodle-performance-comparison
+#   ./test_runner.sh [OPTIONS] {run_group_name} {run_description} {test_plan_file_path} {users_file_path}
 #
 # Arguments:
 # * $1 => The run group name, there will be comparision graphs by this group name
 # * $2 => The run description, useful to identify the changes between runs.
 # * $3 => The test plan file path
 # * $4 => The path to the file with user's login data
+#
+# Options:
+# * -u => Force the number of users (threads)
+# * -l => Force the number of loops
+# * -r => Force the ramp-up period
+# * -t => Force the throughput
 #
 ##############################################
 
@@ -27,12 +35,66 @@ if [ -e "test_files.properties" ]; then
     load_properties "test_files.properties"
 fi
 
-# We give priority to the ones that comes as arguments.
-if [ ! -z "$3" ]; then
-    $testplanfile = $3
+if [ "$#" -lt 2 ]; then
+    echo "Error: Not enough arguments. Open test_runner.sh for more details."
+    exit 1
 fi
-if [ ! -z "$4" ]; then
-    $testusersfile = $4
+
+# Getting jmeter custom options.
+while [ $# -gt 0 ]; do
+    case $1 in
+        -u)
+            users=" -Jusers=$2"
+            shift 2
+            ;;
+        -l)
+            loops=" -Jloops=$2"
+            shift 2
+            ;;
+        -r)
+            rampup=" -Jrampup=$2"
+            shift 2
+            ;;
+        -t)
+            throughput=" -Jthroughput=$2"
+            shift 2
+            ;;
+        *)
+            # Wrong argument; True... we don't support "-[a-zA-Z] arguments.
+            if [ "${1:0:1}" == "-" ] && [ "${#1}" -eq "2" ]; then
+                echo "Error: Unsupported option $1"
+                exit 1
+            fi
+
+            if [ -z "$group" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+                group=$1
+                shift
+            fi
+
+            if [ -z "$description" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+                description=$1
+                shift
+            fi
+
+            if [ ! -z "$1" ] && [ -z "$testplanarg" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+                testplanarg=$1
+                shift
+            fi
+
+            if [ ! -z "$1" ] && [ -z "$testusersfilearg" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+                testusersfilearg=$1
+                shift
+            fi
+            ;;
+    esac
+done
+
+# We give priority to the ones that comes as arguments.
+if [ ! -z "$testplanarg" ]; then
+    $testplanfile = $testplanarg
+fi
+if [ ! -z "$testusersfilearg" ]; then
+    $testusersfile = $testusersfilearg
 fi
 
 # If there is no test_files.properties and no files were provided we throw an error.
@@ -57,8 +119,9 @@ logfile="logs/jmeter.$datestring.log"
 runoutput="runs_outputs/$datestring.output"
 
 # Run it baby! (without GUI).
+echo "Test running... (time for a coffee?)"
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$1" -Jdesc="$2" > $runoutput
+$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" $users $loops $rampup $throughput > $runoutput
 jmeterexitcode=$?
 if [ "$jmeterexitcode" -ne "0" ] ; then
     echo "Error: Jmeter can not run, ensure that:"
