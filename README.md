@@ -103,7 +103,10 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
 
 ### Using your own sql dump (Moodle 2.6 onwards)
-The installation is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump and is not as easy to automate as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
+The installation and configuration is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump, it is not that easy to automate, as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
+
+Consider that, in this case, $baserepository and $basecommit will not be useful (they are useless as you are providing the database dump) so you should ensure that there are no changes in tool_generatro between the before and after branches you are using, you can do it checking that non of the commits between before and after branches is in the list of base hashes we provide in webserver_config.properties.dist.
+
 * *cd /webserver/path/to/moodle-performance-comparison*
 * Restore your dataroot
 * Restore your database
@@ -125,7 +128,7 @@ The installation is the same, it also depends on if you use the same computer fo
 >
 >    databasebackup="/absolute/path/to/the/database/backup.sql"
 
-* Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> ....
+* Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> restart_services.sh -> test_runner.sh
 
 ### Using your own sql dump (before Moodle 2.6)
 Moodle 2.6 introduces the site and the test plan generators, so you can not use them if you are comparing previous branches. But you can

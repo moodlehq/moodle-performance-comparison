@@ -83,12 +83,8 @@ Press [q] to stop the script or, if you have already done it, any other key to c
     fi
 fi
 
-# Checking out after branch.
-git fetch origin
-git checkout $afterbranch
-git rebase origin/$afterbranch
-
-# Upgrading moodle, although we are not sure that before and after branch are different.
+# Upgrading moodle, although we are not sure that before and after branches are different.
+checkout_branch $afterrepository 'after' $afterbranch
 php admin/cli/upgrade.php --non-interactive --allow-unstable
 
 # Info, all went as expected and we are all happy.

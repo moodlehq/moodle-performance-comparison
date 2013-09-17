@@ -93,19 +93,7 @@ fi
 # Move to moodle dirroot and begin setting up everything.
 cd moodle
 
-# Getting the code.
-if [ ! -e ".git" ]; then
-    git clone $repository .
-else
-    git fetch origin
-    git show-ref --verify --quiet refs/heads/$beforebranch
-    if [ $? == "0" ]; then
-        # Deleting old local branch in case there are history changes so we avoid conflicts.
-        git checkout master
-        git branch -D $beforebranch 2> /dev/null
-    fi
-fi
-git checkout -b $beforebranch origin/$beforebranch
+checkout_branch $baserepository 'base' $basecommit
 
 # Copy config.php template and set user properties.
 replacements="%%dbtype%%#$dbtype
@@ -186,6 +174,10 @@ testusersfile=$filenameusers
 datarootbackup=$filenamedataroot
 databasebackup=$filenamedatabase"
 echo "$generatedfiles" > "$currentwd/test_files.properties"
+
+# Upgrading moodle, although we are not sure that base and before branch are different.
+checkout_branch $beforerepository 'before' $beforebranch
+php admin/cli/upgrade.php --non-interactive --allow-unstable
 
 # Also output the info.
 outputinfo="
