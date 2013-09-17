@@ -86,6 +86,11 @@ fi
 # Upgrading moodle, although we are not sure that before and after branches are different.
 checkout_branch $afterrepository 'after' $afterbranch
 php admin/cli/upgrade.php --non-interactive --allow-unstable
+upgradeexitcode=$?
+if [ "$upgradeexitcode" -ne "0" ]; then
+    echo "Error: Moodle can not be upgraded to $afterbranch"
+    exit $upgradeexitcode
+fi
 
 # Info, all went as expected and we are all happy.
 outputinfo="

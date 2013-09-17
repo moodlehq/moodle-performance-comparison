@@ -29,14 +29,12 @@ if [ "$(id -u)" != "0" ]; then
 fi
 
 # Stop all the services
-for service in "${servicesarray[@]}"
-do
+for service in "${servicesarray[@]}"; do
     service $service stop
 done
 
 # Start them again.
-for service in "${servicesarray[@]}"
-do
+for service in "${servicesarray[@]}"; do
     service $service start
 done
 

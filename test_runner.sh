@@ -30,6 +30,9 @@ set -e
 # Dependencies.
 . ./lib/lib.sh
 
+# Load properties.
+load_properties "jmeter_config.properties"
+
 # Load the generated files locations (when jmeter is running in the same server than the web server).
 if [ -e "test_files.properties" ]; then
     load_properties "test_files.properties"
@@ -110,18 +113,15 @@ else
     chmod 777 "cache"
 fi
 
-# Load properties.
-load_properties "jmeter_config.properties"
-
 # Uses the test plan specified in the CLI call.
 datestring=`date '+%Y%m%d%H%M'`
 logfile="logs/jmeter.$datestring.log"
 runoutput="runs_outputs/$datestring.output"
 
-# Getting the current site.
-siteversion="$(cat moodle/version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
-sitebranch="$(cat moodle/version.php | grep '$branch' | grep -o '[0-9]\+')"
+# Getting the current site data.
 cd moodle
+siteversion="$(cat version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
+sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+')"
 sitecommit="$(git show --oneline | head -n 1)"
 cd ..
 
@@ -130,7 +130,7 @@ echo "Test running... (time for a coffee?)"
 jmeterbin=$jmeter_path/bin/jmeter
 $jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $users $loops $rampup $throughput > $runoutput
 jmeterexitcode=$?
-if [ "$jmeterexitcode" -ne "0" ] ; then
+if [ "$jmeterexitcode" -ne "0" ]; then
     echo "Error: Jmeter can not run, ensure that:"
     echo "* The test plan and the users files are ok"
     echo "* You provide correct arguments to the script"

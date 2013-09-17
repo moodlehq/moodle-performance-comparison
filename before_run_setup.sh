@@ -55,7 +55,7 @@ fi
 load_properties "webserver_config.properties"
 
 # Creating & cleaning dirroot & dataroot (keeping .git)
-if [ ! -e $dataroot ]; then
+if [ ! -e "$dataroot" ]; then
     mkdir -m $permissions $dataroot
 fi
 rm $dataroot/* -rf
@@ -113,7 +113,7 @@ done
 # Overwrites the previous config.php file.
 echo "${configfilecontents}" > config.php
 permissionsexitcode=$?
-if [ "$permissionsexitcode" -ne "0" ] ; then
+if [ "$permissionsexitcode" -ne "0" ]; then
     echo "Error: Moodle's config.php can not be written, check $currentwd/moodle directory (and $currentwd/moodle/config.php if it exists) permissions."
     exit $permissionsexitcode
 fi
@@ -121,9 +121,19 @@ chmod $permissions config.php
 
 # Install the site with user specified params.
 php admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" $debug
+installexitcode=$?
+if [ "$installexitcode" -ne "0" ]; then
+    echo "Error: Moodle can not be installed"
+    exit $installexitcode
+fi
 
 # Generate courses.
 php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck $debug
+testsiteexitcode=$?
+if [ "$testsiteexitcode" -ne "0" ]; then
+    echo "Error: The test site can not be generated"
+    exit $testsiteexitcode
+fi
 
 # We capture the output to get the files we will need.
 testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${sizecourse[$1]}' --bypasscheck'$debug
@@ -178,6 +188,11 @@ echo "$generatedfiles" > "$currentwd/test_files.properties"
 # Upgrading moodle, although we are not sure that base and before branch are different.
 checkout_branch $beforerepository 'before' $beforebranch
 php admin/cli/upgrade.php --non-interactive --allow-unstable
+upgradeexitcode=$?
+if [ "$upgradeexitcode" -ne "0" ]; then
+    echo "Error: Moodle can not be upgraded to $beforebranch"
+    exit $upgradeexitcode
+fi
 
 # Also output the info.
 outputinfo="
