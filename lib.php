@@ -411,6 +411,10 @@ function get_runs($dir = null) {
             if (preg_match("/sitecommit = '([^']+)'/", $start, $matches)) {
                 $sitecommit = $matches[1];
             }
+            $size = "Unknown size";
+            if (preg_match("/size = '([^']+)'/", $start, $matches)) {
+                $size = $matches[1] . ' size';
+            }
 
             $runs[$key] = array(
                 'key' => $key,
@@ -425,7 +429,8 @@ function get_runs($dir = null) {
                 'throughput' => $throughput,
                 'siteversion' => $siteversion,
                 'sitebranch' => $sitebranch,
-                'sitecommit' => $sitecommit
+                'sitecommit' => $sitecommit,
+                'size' => $size
             );
         }
     }
@@ -445,9 +450,10 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($before == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group], $run[size], Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
+    echo "<br/><br/>";
     echo "<label for='after'>After:&nbsp;</label>";
     echo "<select name='after' id='after'>";
     foreach ($runs as $date => $run) {
@@ -455,7 +461,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         if ($after == $date) {
             $selected = ' selected="selected"';
         }
-        echo "<option$selected value='$date'>$run[desc] - $run[group] Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
+        echo "<option$selected value='$date'>$run[desc] - $run[group], $run[size], Moodle $run[sitebranch] ($run[siteversion], $run[sitecommit]) ($run[users] users * $run[loopcount] loop, rampup=$run[rampup] throughput=$run[throughput]) $run[time]</option>";
     }
     echo "</select>";
     echo "<hr />";
