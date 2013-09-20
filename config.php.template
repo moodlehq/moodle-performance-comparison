@@ -24,6 +24,15 @@ $CFG->admin     = 'admin';
 $CFG->debug = false;
 $CFG->debugdisplay = false;
 
+// No cache_text to have results as stable as possible.
+$CFG->cachetext = 0;
+
+// Time between threads accesses are randomly generated so we can
+// not have stable results with the core LASTACCESS_UPDATE_SECS value.
+// Moodle will try to define it again, the php error will be hidden with
+// debug mode disabled. https://tracker.moodle.org/browse/MDL-41910
+define('LASTACCESS_UPDATE_SECS', 9999999999);
+
 // Set the generated users password to avoid the default non-loggeable one.
 $CFG->tool_generator_users_password = '%%toolgeneratorpassword%%';
 
