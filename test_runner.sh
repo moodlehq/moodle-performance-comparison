@@ -64,27 +64,27 @@ while [ $# -gt 0 ]; do
             ;;
         *)
             # Wrong argument; True... we don't support "-[a-zA-Z] arguments.
-            if [ "${1:0:1}" == "-" ] && [ "${#1}" -eq "2" ]; then
+            if [ "${1:0:1}" == "-" ]; then
                 echo "Error: Unsupported option $1"
                 exit 1
             fi
 
-            if [ -z "$group" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+            if [ -z "$group" ] && [ "${1:0:1}" != "-" ]; then
                 group=$1
                 shift
             fi
 
-            if [ -z "$description" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+            if [ -z "$description" ] && [ "${1:0:1}" != "-" ]; then
                 description=$1
                 shift
             fi
 
-            if [ ! -z "$1" ] && [ -z "$testplanarg" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+            if [ ! -z "$1" ] && [ -z "$testplanarg" ] && [ "${1:0:1}" != "-" ]; then
                 testplanarg=$1
                 shift
             fi
 
-            if [ ! -z "$1" ] && [ -z "$testusersfilearg" ] && [ "${1:0:1}" != "-" ] && [ "${#1}" -ne "2" ]; then
+            if [ ! -z "$1" ] && [ -z "$testusersfilearg" ] && [ "${1:0:1}" != "-" ]; then
                 testusersfilearg=$1
                 shift
             fi
