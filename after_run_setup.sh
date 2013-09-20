@@ -84,7 +84,7 @@ Press [q] to stop the script or, if you have already done it, any other key to c
 fi
 
 # Upgrading moodle, although we are not sure that before and after branches are different.
-checkout_branch $afterrepository 'after' $afterbranch
+checkout_branch $repository 'origin' $afterbranch
 php admin/cli/upgrade.php --non-interactive --allow-unstable
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then

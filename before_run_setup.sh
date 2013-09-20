@@ -74,10 +74,10 @@ fi
 
 # Creating new database and delete it if it already exists.
 if [ "$dbtype" == "pgsql" ]; then
-    psql -h "$dbhost" -U "$dbuser" -c "DROP DATABASE $dbname"
+    psql -h "$dbhost" -U "$dbuser" -c "DROP DATABASE $dbname" 2> /dev/null
     psql -h "$dbhost" -U "$dbuser" -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
 elif [ "$dbtype" == "mysqli" ]; then
-    mysql -h "$dbhost" -u "$dbuser" -p -e "DROP DATABASE $dbname"
+    mysql -h "$dbhost" -u "$dbuser" -p -e "DROP DATABASE $dbname" 2> /dev/null
     mysql -h "$dbhost" -u "$dbuser" -p -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
 else
     confirmoutput="Only postgres and mysql support: You need to manually create your database. 
@@ -93,7 +93,7 @@ fi
 # Move to moodle dirroot and begin setting up everything.
 cd moodle
 
-checkout_branch $baserepository 'base' $basecommit
+checkout_branch $repository 'origin' $basecommit
 
 # Copy config.php template and set user properties.
 replacements="%%dbtype%%#$dbtype
@@ -186,7 +186,7 @@ databasebackup=$filenamedatabase"
 echo "$generatedfiles" > "$currentwd/test_files.properties"
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
-checkout_branch $beforerepository 'before' $beforebranch
+checkout_branch $repository 'origin' $beforebranch
 php admin/cli/upgrade.php --non-interactive --allow-unstable
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then

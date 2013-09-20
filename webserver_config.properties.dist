@@ -25,28 +25,26 @@ toolgeneratorpassword="moodlerules"
 
 ## Repository and test branches information ##################
 
+# The moodle repository where the branches are located.
+repository="git://github.com/YOURUSER/moodle.git"
+
 # The base where both before and after branches will be updated.
 # This is necessary in case there are changes in
 # the generators codebase between before and after, we would not
 # be able to compare results as the test plan generator or the
 # generated data would change, so this setting will always be
 # pointing to a minor or major release hash.
-# TODO: Provide a list of valid hashes according to the generator changes!.
-baserepository="git://github.com/moodle/moodle.git"
-basecommit="IAMAHASH"
-
-# The repository Moodle codebase will be pulled from.
-# Usually Moodle's public repository or your own repository if you
-# want to test against another of your branches.
-beforerepository="git://github.com/moodle/moodle.git"
+#
+# You don't need to change this value
+# This is Moodle 2.6dev version 2013091300.00
+basecommit="83f26f640738a3e4de89d1765c66e4ceeb8503a8"
+# Older bases in the branch
+# This is Moodle X.X.X+ version NNNNNNNNNN.NN
+# basecommit="this_is_an_example_of_how_we_will_show_previous_base_commits_of_this_branch"
 
 # The original branch.
 # Usually one of Moodle's weekly released branches. You can also use a git hash here.
 beforebranch="master"
-
-# The repository Moodle codebase will be pulled from.
-# Usually your own repository if you want to test your branches.
-afterrepository="git://github.com/moodle/moodle.git"
 
 # The branch to compare against.
 # Usually your development branch or the same $beforebranch value if

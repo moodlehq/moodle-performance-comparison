@@ -105,8 +105,6 @@ Note that you can run the tests as many times as you want, you just need to run 
 ### Using your own sql dump (Moodle 2.6 onwards)
 The installation and configuration is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump, it is not that easy to automate, as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
 
-Consider that, in this case, $baserepository and $basecommit will not be useful (they are useless as you are providing the database dump) so you should ensure that there are no changes in tool_generatro between the before and after branches you are using, you can do it checking that non of the commits between before and after branches is in the list of base hashes we provide in webserver_config.properties.dist.
-
 * *cd /webserver/path/to/moodle-performance-comparison*
 * Restore your dataroot
 * Restore your database
@@ -163,3 +161,4 @@ This tool in only intended to be used in development/testing environments inside
 * You can find runs outputs in runs_outputs/ the results in runs_samples/ and the php arrays generated from them in runs/
 * The generated .jtl files can be big. Don't hesitate to get rid of them if you don't need them for extra analytic purposes.
 * Same with $backupsdir/ contents, if you run before_run_setup.sh many time you will have a looot of hd space wasted
+* If files with _java_pid[\d]+.hprof_ format are generated in your project root means that jmeter is running out of resource. http://wiki.apache.org/jmeter/JMeterFAQ#JMeter_keeps_getting_.22Out_of_Memory.22_errors.__What_can_I_do.3F for more info.
