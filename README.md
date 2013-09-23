@@ -10,14 +10,14 @@ They can be used to compare:
 * Different configurations and cache stores configurations
 * Different hardware
 * Web, database and other services tunning
-* Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump Moodle 2.6 onwards](#using-your-own-sql-dump-moodle-26-onwards) or  [Using your own sql dump (before Moodle 2.6)](#using-your-own-sql-dump-before-moodle-26)
+* Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump Moodle 2.5 onwards](#using-your-own-sql-dump-moodle-25-onwards) or  [Using your own sql dump (before Moodle 2.5)](#using-your-own-sql-dump-before-moodle-25)
 
 
 ## Features
 
-* Clean site installation (from Moodle 2.6 onwards)
-* Fixed data set generation with courses, users, enrolments, module instances... (from Moodle 2.6 onwards)
-* JMeter test plan generation from course contents (from Moodle 2.6 onwards)
+* Clean site installation (from Moodle 2.5 onwards)
+* Fixed data set generation with courses, users, enrolments, module instances... (from Moodle 2.5 onwards)
+* JMeter test plan generation from course contents (from Moodle 2.5 onwards)
 * Web and database warm-up processes included in the test plan (results not collected)
 * JMeter runs gathering results about moodle performance data (database reads/writes, memory usage...)
 * Runs results comparison
@@ -102,19 +102,24 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *wget http://webserver/moodle/site/path/testusers.csv http://webserver/moodle/site/path/testplan.jmx*
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
 
-### Using your own sql dump (Moodle 2.6 onwards)
+### Using your own sql dump (Moodle 2.5 onwards)
 The installation and configuration is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump, it is not that easy to automate, as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
 
 * *cd /webserver/path/to/moodle-performance-comparison*
-* Restore your dataroot
-* Restore your database
-* Generate the test plan. You need to provide the shortname of the course that will be tested
+* Restore your dataroot to $dataroot
+* Restore your database to $dbname in $dbhost
+* Get the moodle code
+* Upgrade the site to $beforebranch
     + *cd moodle/*
-    + *php admin/tool/generator/cli/maketestsite.php --size="THESIZEYOUWANT" --shortname="TARGETCOURSESHORTNAME" fixeddataset --bypasscheck --updateuserspassword*
+    + *git checkout $beforebranch*
+    + *php admin/cli/upgrade.php --allow-unstable --non-interactive*
+* Generate the test plan updating users passwords. You need to provide the shortname of the course that will be tested
+    + *php admin/tool/generator/cli/maketestplan.php --size="THESIZEYOUWANT" --shortname="TARGETCOURSESHORTNAME" --bypasscheck --updateuserspassword*
 * Download the test plan and the test users. The URLs are provided by maketestsite.php in the previous step, before the performance info output begins.
     + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/testplan_NNNNNNNNNNNN_NNNN.jmx -O testplan.jmx*
     + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/users_NNNNNNNNNNNN_NNNN.jmx -O testusers.csv*
-* Create moodle-performance-comparison/test_files.properties
+* Backup dataroot and database (pg_dump or mysqldump), this backup will contain the updated passwords
+* Create moodle-performance-comparison/test_files.properties with the backups you just generated and the test plan data
     + *cd ../*
     + Create a new /path/to/moodle-performance-comparison/test_files.properties file with the following content:
 
@@ -126,15 +131,15 @@ The installation and configuration is the same, it also depends on if you use th
 >
 >    databasebackup="/absolute/path/to/the/database/backup.sql"
 
-* Continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> restart_services.sh -> test_runner.sh
+* cd */path/to/moodle-performance-comparison* and continue the normal process from restart_services.sh -> test_runner.sh -> after_run_setup.sh -> restart_services.sh -> test_runner.sh
 
-### Using your own sql dump (before Moodle 2.6)
-Moodle 2.6 introduces the site and the test plan generators, so you can not use them if you are comparing previous branches. But you can
-* Use the template included in Moodle 2.6 codebase and fill the placeholders with one of your site courses info and the test plan users, loops and ramp up period
+### Using your own sql dump (before Moodle 2.5)
+Moodle 2.5 introduces the site and the test plan generators, so you can not use them if you are comparing previous branches. But you can:
+* Use the template included in Moodle 2.5 codebase and fill the placeholders with one of your site courses info and the test plan users, loops and ramp up period
     + The test plan template is located in *admin/tool/generator/testplan.template.jmx*
 * Fill a testusers.php with the target course data
     + You will need to check that the test data has enough users according to the data you provided in the test plan
-* Follow [Using your own sql dump (Moodle 2.6 onwards)](#using-your-own-sql-dump-moodle-26-onwards) instructions 
+* Follow [Using your own sql dump (Moodle 2.5 onwards)](#using-your-own-sql-dump-moodle-25-onwards) instructions 
 
 
 ## Advanced usage
