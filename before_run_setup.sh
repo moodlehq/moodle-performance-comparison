@@ -135,6 +135,14 @@ if [ "$testsiteexitcode" -ne "0" ]; then
     exit $testsiteexitcode
 fi
 
+# Enable advanced settings and list courses in the frontpage.
+php ../set_moodle_site.php
+setsiteexitcode=$?
+if [ "$setsiteexitcode" -ne "0" ]; then
+    echo "Error: The test site can not be configured"
+    exit $setsiteexitcode
+fi
+
 # We capture the output to get the files we will need.
 testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${sizecourse[$1]}' --bypasscheck'$debug
 testplanfiles="$(${testplancommand})"
