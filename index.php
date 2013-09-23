@@ -81,7 +81,7 @@ if ($before && $after) {
         echo $output;
         $statsarray[] = $stats;
         display_organised_results($organiseby, $page['before'], $page['after']);
-        
+
         echo "<div class='graphdiv'>";
         foreach ($PROPERTIES as $PROPERTY) {
             if (!property_exists($page['before'], $PROPERTY)) {

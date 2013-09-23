@@ -30,7 +30,7 @@ function collapse_pages(Y) {
     });
     Y.one('#pagearray').append(pagelist);
     pages.addClass('hidden');
-    
+
     Y.all('.largegraph').each(function(graph){
         graph.on('click', function(e){
             e.halt();
@@ -41,7 +41,7 @@ function collapse_pages(Y) {
             overlay.on('click', function(){lightbox.remove();overlay.remove();});
         });
     }, this);
-    
+
     var h = self.document.location.hash.substring(1);
     if (h) {
         var found = false;

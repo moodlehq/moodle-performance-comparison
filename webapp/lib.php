@@ -29,14 +29,14 @@ $PROPERTIES = array_keys($PREFIX);
 $BASEDIR = __DIR__ . '/../'; //'/var/www/localhost/jmeter';
 
 class page {
-    
+
     public $url;
     public $name;
     public $gitbranch;
     public $desc;
     public $loopcount;
     public $users;
-    
+
     public $thread = array();
     public $starttime = array();
     public $dbreads = array();
@@ -49,9 +49,9 @@ class page {
     public $bytes = array();
     public $time = array();
     public $latency = array();
-    
+
     public $count = 0;
-    
+
     public function __construct($url, $name, $gitbranch, $desc = 'Uknown run', $loopcount = 30, $users = 10) {
         $this->url = $url;
         $this->name = $name;
@@ -60,10 +60,10 @@ class page {
         $this->loopcount = $loopcount;
         $this->users = $users;
     }
-    
+
     public function from_result(array $page) {
         global $PROPERTIES;
-        
+
         if (array_key_exists('thread', $page)) {
             $this->thread[$this->count] = $page['thread'];
         }
@@ -78,13 +78,13 @@ class page {
             }
             $this->{$property}[$this->count] = (float)$page[$property];
         }
-        
+
         $this->count++;
     }
-    
+
     public function average() {
         global $PROPERTIES;
-        
+
         $return = array();
         foreach ($PROPERTIES as $property) {
             if (property_exists($this, $property)) {
@@ -93,10 +93,10 @@ class page {
         }
         return $return;
     }
-    
+
     public function get_info() {
         global $PROPERTIES;
-        
+
         $results = array();
         foreach ($PROPERTIES as $key) {
             if (!property_exists($this, $key)) {
@@ -127,25 +127,25 @@ class page {
 
         return $results;
     }
-    
+
     public function average_by_property($property) {
         global $PROPERTIES;
-        
+
         $result = array();
         foreach ($PROPERTIES as $PROPERTY) {
             $result[$PROPERTY] = array();
         }
-        
+
         foreach ($this->{$property} as $key => $value) {
             foreach ($PROPERTIES as $PROPERTY) {
                 $result[$PROPERTY][$value][] = $this->{$PROPERTY}[$key];
             }
         }
-        
+
         foreach ($PROPERTIES as $PROPERTY) {
             krsort($result[$PROPERTY]);
         }
-        
+
         $valueresult = array();
         foreach ($result[$property] as $value => $values) {
             $count = count($values);
@@ -154,7 +154,7 @@ class page {
                 $valueresult[$value][$PROPERTY] = round(array_sum($result[$PROPERTY][$value])/$count, 1);
             }
         }
-        
+
         return $valueresult;
     }
 
@@ -230,7 +230,7 @@ function display_organised_results($property, page $before, page $after) {
         }
         echo "</tr>";
     }
-    
+
     $keydisplayed = false;
     foreach ($propertyaveragesafter as $key => $values) {
         echo "<tr>";
@@ -270,13 +270,13 @@ function display_organised_results($property, page $before, page $after) {
 
 function display_results(page $beforepage, page $afterpage) {
     global $PROPERTIES;
-    
+
     $before = $beforepage->get_info();
     $after = $afterpage->get_info();
-    
+
     $output = '';
     $stats = '';
-    
+
     $output .= "<table cellspacing='0' cellpadding='3px'>";
     $output .= "<tr style='background-color:#eee;'>";
     $output .= "<th>Run</th>";
@@ -285,7 +285,7 @@ function display_results(page $beforepage, page $afterpage) {
         $output .= "<th style='width:{$width}%'>$PROPERTY</th>";
     }
     $output .= "</tr>";
-    
+
     $output .= "<tr>";
     $output .= "<th style='text-align:right;background-color:#eee;'>$beforepage->gitbranch branch (Before) $beforepage->count hits</th>";
     foreach ($PROPERTIES as $PROPERTY) {
@@ -293,7 +293,7 @@ function display_results(page $beforepage, page $afterpage) {
         $output .= "<td title='Average: $value[average]\nMin: $value[min]\n Max: $value[max]'>$value[average]</td>";
     }
     $output .= "</tr>";
-    
+
     $output .= "<tr>";
     $output .= "<th style='text-align:right;background-color:#eee;'>$afterpage->gitbranch branch (After)  $afterpage->count hits</th>";
     foreach ($PROPERTIES as $PROPERTY) {
@@ -314,7 +314,7 @@ function display_results(page $beforepage, page $afterpage) {
         $output .= "<td style='color:$color;' title='Average: $ave\n Min: $min\n Max: $max'>$ave$diff</td>";
     }
     $output .= "</tr>";
-    
+
     $output .= "<tr>";
     $output .= "<th style='text-align:right;background-color:#eee;'>% Improv.</th>";
     foreach ($PROPERTIES as $PROPERTY) {
@@ -342,18 +342,18 @@ function display_results(page $beforepage, page $afterpage) {
             $sign = ' ';
             $color = '#666';
         }
-        
+
         $stats .= "<div class='statsbox $PROPERTY'>";
         $stats .= "<h3>$PROPERTY</h3>";
         $stats .= "<p style='color:$color'>$sign$sp<span class='perc'>$perc</span></p>";
         $stats .= "</div>";
-        
+
         $output .= "<td style='color:$color;font-weight:bold;'>$p</td>";
     }
     $output .= "</tr>";
-    
+
     $output .= "</table>";
-    
+
     $stats = "<div class='collectedstats' rel='$beforepage->name'><div class='pagename'>$beforepage->name<br /><span style='font-size:50%;font-weight:normal;font-style:italic;'>$beforepage->url</span></div><div class='wrapper'>$stats</div></div>";
     return array($output, $stats);
 }
@@ -479,7 +479,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
         'filesincluded' => 'Files included',
         'bytes' => 'Bytes',
     );
-    
+
     foreach ($options as $value => $string) {
         $selected = '';
         if ($value == $organiseby) {
@@ -509,12 +509,12 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
     if (!is_dir($path.$subdir)) {
         mkdir($path.$subdir);
     }
-    
+
     $image = imagecreatetruecolor($width, $height);
     if (function_exists('imageantialias')) {
         imageantialias($image, true);
     }
-    
+
     $colours = new stdClass;
     $colours->black = imagecolorallocate($image, 0, 0, 0);
     $colours->white = imagecolorallocate($image, 255, 255, 255);
@@ -526,15 +526,15 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
 
     $colours->afterlineflat = imagecolorallocate($image, 255, 0, 0);
     $colours->afterlineave = imagecolorallocate($image, 255, 32, 32);
-    
+
     $colours->beforelineflat = imagecolorallocate($image, 0, 0, 255);
     $colours->beforelineave = imagecolorallocate($image, 32, 32, 255);
-    
+
     $x1 = 10;
     $x2 = $width-10;
     $y1 = 30;
     $y2 = $height-10;
-    
+
     imagefill($image, 0, 0, $colours->white);
     imagefilledrectangle($image, $x1-2, $y1+2, $x2+2, $y2+2, $colours->shadow);
     imagefilledrectangle($image, $x1, $y1, $x2, $y2, $colours->white);
@@ -542,11 +542,11 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
 
     $graphheight = $y2 - $y1 -2;
     $graphwidth = $x2 - $x1 - 2;
-    
+
     $total = count($before->$field);
     $min = min(min($before->$field), min($after->$field));
     $max = max(max($before->$field), max($after->$field));
-    
+
     $dmin = $min*0.1;
     if ($min >= 10 && $min < 100) {
         $dmin = $min*0.2;
@@ -558,7 +558,7 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
     $min -= $dmin;
     $max += $dmin;
 
-    
+
     if ($min > 0 && $min < 10) {
         $min = 0;
     } else if ($min >= 10 && $min < 100) {
@@ -577,12 +577,12 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
     }
 
     $lines = min($graphwidth, $total);
-    
+
     $gap = (($graphwidth-$lines) / $lines);
     if ($gap < 0) {
         $gap = 0;
     }
-    
+
     $range = $max - $min;
     if ($range > 0) {
         $ratio = $graphheight / $range;
@@ -595,33 +595,33 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
     $pb = null;
     $pa = null;
     $px = null;
-    
+
     $bc = null;
     $ac = null;
-    
+
     $beforeaverages = array();
     $afteraverages = array();
-    
+
     $averagesamplespace = max(20, $total/20);
-    
+
     for ($i=1;$i<$lines;$i++) {
         $xpoint = $i+$x1+(($i-1)*$gap);
-        
+
         $ybefore = ($height - 10) - floor(($b-$min) * $ratio);
         $yafter = ($height - 10) - floor(($a-$min) * $ratio);
-        
+
         if ($i > $averagesamplespace/2 && $i < $lines - $averagesamplespace/2) {
             $beforechunk = array_slice($before->$field, $i-$averagesamplespace/2, $averagesamplespace);
             $beforechunk = array_sum($beforechunk) / count($beforechunk);
             $beforechunk = ($height - 10) - floor(($beforechunk-$min) * $ratio);
             $beforeaverages[$xpoint] = $beforechunk;
-            
+
             $afterchunk = array_slice($after->$field, $i-$averagesamplespace/2, $averagesamplespace);
             $afterchunk = array_sum($afterchunk) / count($afterchunk);
             $afterchunk = ($height - 10) - floor(($afterchunk-$min) * $ratio);
             $afteraverages[$xpoint] = $afterchunk;
         }
-        
+
         if ($gap > 0 && $px != null) {
             if ($gap > 3) {
                 imagefilledellipse($image, $xpoint, $ybefore, 3, 3, $colours->beforepoint);
@@ -636,20 +636,20 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
         $px = $xpoint;
         $pb = $ybefore;
         $pa = $yafter;
-        
+
         $b = next($before->$field);
         $a = next($after->$field);
     }
-    
+
     $ybefore = array_sum($before->$field)/$total-$min;
     $ybefore = ($height - 10) - round($ybefore * $ratio, 1);
-    
+
     $yafter = array_sum($after->$field)/$total-$min;
     $yafter = ($height - 10) - round($yafter * $ratio, 1);
-    
+
     imagedashedline($image, 11, $ybefore, $width-12, $ybefore, $colours->beforelineflat);
     imagedashedline($image, 11, $yafter, $width-12, $yafter, $colours->afterlineflat);
-    
+
     $lastx = null;
     $lasty = null;
     foreach ($beforeaverages as $x => $y) {
@@ -668,11 +668,11 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
         $lastx = $x;
         $lasty = $y;
     }
-    
+
     write_graph_y_labels($image, $min, $max, $width, $height, $colours->black);
     write_graph_title($image, $field, $width, $height, $colours->black);
     write_graph_legend($image, $colours, $width, $height);
-    
+
     imagepng($image, $path.$name, 9);
     return $name;
 }
@@ -691,14 +691,14 @@ function write_graph_title(&$image, $title, $width, $height, $colour) {
 
 function write_graph_legend(&$image, $colours, $width, $height) {
     $font = get_font();
-    
+
     $size = 7;
     $angle = 0;
-    
+
     $title = 'Before';
     $bb = imagettfbbox($size, $angle, $font, $title);
     imagettftext($image, $size, $angle, ($width/2)-($bb[2]-$bb[0]), $height-12, $colours->beforepoint, $font, $title);
-    
+
     $title = 'After';
     $bb = imagettfbbox($size, $angle, $font, $title);
     imagettftext($image, $size, $angle, ($width/2)+($bb[2]-$bb[0]), $height-12, $colours->afterpoint, $font, $title);
@@ -746,7 +746,7 @@ function build_pages_array(array $runs, $before, $after) {
             $pages[$key]['after']->from_result($page);
         }
     }
-    
+
     $combined['before'] = new page('Before and after', 'Combined total properties', 'Combined');
     $combined['after'] = new page('Combined after', 'Combined total properties', 'Combined');
     foreach ($pages as $pagearray) {
@@ -770,9 +770,9 @@ function build_pages_array(array $runs, $before, $after) {
                 $count++;
             }
         }
-        
+
     }
-    
+
     $pages['combined'] = $combined;
     return $pages;
 }
