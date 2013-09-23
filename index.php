@@ -13,7 +13,7 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once('lib.php');
+require_once(__DIR__ . '/webapp/lib.php');
 
 $runs = get_runs();
 $before = null;
@@ -49,8 +49,8 @@ if ($before && $after) {
 echo "<html>";
 echo "<head>";
 echo '<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.3.0/build/yui/yui-min.js&3.3.0/build/oop/oop-min.js&3.3.0/build/event-custom/event-custom-base-min.js&3.3.0/build/event/event-base-min.js&3.3.0/build/dom/dom-base-min.js&3.3.0/build/dom/selector-native-min.js&3.3.0/build/dom/selector-css2-min.js&3.3.0/build/node/node-base-min.js&3.3.0/build/event/event-base-ie-min.js&3.3.0/build/event-custom/event-custom-complex-min.js&3.3.0/build/event/event-synthetic-min.js&3.3.0/build/event/event-hover-min.js&3.3.0/build/dom/dom-style-min.js&3.3.0/build/dom/dom-style-ie-min.js&3.3.0/build/node/node-style-min.js"></script>';
-echo '<link rel="stylesheet" type="text/css" href="resources/jmeter.css" />';
-echo "<script type='text/javascript' src='resources/jmeter.js'></script>";
+echo '<link rel="stylesheet" type="text/css" href="webapp/jmeter.css" />';
+echo "<script type='text/javascript' src='webapp/jmeter.js'></script>";
 echo "</head>";
 echo "<body>";
 
@@ -88,7 +88,7 @@ if ($before && $after) {
                 continue;
             }
             $graphfile = produce_page_graph($PROPERTY, $before, $page['before'], $after, $page['after'], $width, $height, array('x' => $mostcommononly));
-            echo "<a href='graph.php?before=$before&after=$after&property=$PROPERTY&page=$key' class='largegraph'>";
+            echo "<a href='webapp/graph.php?before=$before&after=$after&property=$PROPERTY&page=$key' class='largegraph'>";
             echo "<img src='./cache/".$graphfile."' alt='$PROPERTY' style='width:{$width}px;height:{$height}px;' />";
             echo "</a>";
         }

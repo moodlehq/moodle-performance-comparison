@@ -26,7 +26,7 @@ $PREFIX = array(
 );
 $PROPERTIES = array_keys($PREFIX);
 
-$BASEDIR = dirname(__FILE__); //'/var/www/localhost/jmeter';
+$BASEDIR = __DIR__ . '/../'; //'/var/www/localhost/jmeter';
 
 class page {
     
@@ -706,7 +706,7 @@ function write_graph_legend(&$image, $colours, $width, $height) {
 
 function get_font() {
     global $BASEDIR;
-    return $BASEDIR.'/resources/DejaVuSans.ttf';
+    return $BASEDIR.'/webapp/DejaVuSans.ttf';
 }
 
 function build_pages_array(array $runs, $before, $after) {
