@@ -128,7 +128,7 @@ if [ "$installexitcode" -ne "0" ]; then
 fi
 
 # Generate courses.
-php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck $debug
+php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
 testsiteexitcode=$?
 if [ "$testsiteexitcode" -ne "0" ]; then
     echo "Error: The test site can not be generated"
