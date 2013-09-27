@@ -26,8 +26,7 @@ toolgeneratorpassword="moodlerules"
 ## Repository and test branches information ##################
 
 # The moodle repository where the branches are located.
-# TODO: git://github.com/YOURUSER/moodle.git when MDL-41421 gets integrated
-repository="git://github.com/dmonllao/moodle.git"
+repository="git://github.com/moodle/moodle.git"
 
 # The base where both before and after branches will be updated.
 # This is necessary in case there are changes in
@@ -37,23 +36,21 @@ repository="git://github.com/dmonllao/moodle.git"
 # pointing to a minor or major release hash.
 #
 # You don't need to change this value
-# This is Moodle 2.6dev version 2013091300.00
-# TODO: the weekly dev or 2.6.0 as default when MDL-41421 gets integrated.
-basecommit="7d8a436317f2386b2ad3ab4dabfafdcded54f618"
-# Older bases in the branch
-# This is Moodle X.X.X+ version NNNNNNNNNN.NN
+# This is Moodle 2.6dev version 2013092700.00
+basecommit="d45e65ccadbf4097a970655941ac1c5cae17f26d"
+# Older bases in the branch will be listed here.
+# Example:
+# This is Moodle 2.6dev version 2013092700.00
 # basecommit="this_is_an_example_of_how_we_will_show_previous_base_commits_of_this_branch"
 
 # The original branch.
 # Usually one of Moodle's weekly released branches. You can also use a git hash here.
-# TODO: master as default when MDL-41421 gets integrated.
-beforebranch="MDL-41421_master"
+beforebranch="master"
 
 # The branch to compare against.
 # Usually your development branch or the same $beforebranch value if
 # you are comparing different settings configurations. You can also use a git hash here.
-# TODO: master as default when MDL-41421 gets integrated.
-afterbranch="MDL-41421_master"
+afterbranch="master"
 
 
 ## Others ####################################################
