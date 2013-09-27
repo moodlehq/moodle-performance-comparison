@@ -71,17 +71,23 @@ The installation process differs depending whether you have both the web server 
 
 ## Usage
 
-It also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
+The simplest is to just execute *compare.sh {size}*, but it will only work in development computers where jmeter is installed in the web server and when you are testing differences between different branches. For other cases the process also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
 
 The groupname and description arguments of test_runner.sh are useful to identify the run when comparing results, you can use it to set the branch name, the settings you used or whatever will help you identify which run is it.
 
 Note that you can run the tests as many times as you want, you just need to run after_run_setup.sh and restart_services.sh before running test_runner.sh every time to clean up the site.
 
-### Web and JMeter servers in the same computer (usually a development computer)
+### Web and JMeter servers in the same computer, to find performance differences between different branches (usually a development computer)
+* Run compare.sh specifying the size of the test, the browser will be automatically opened after both runs are finished
+    + ./compare.sh {size}
+* In case the browser doesn't open properly the comparison page, browse to
+    + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
+
+### Web and JMeter servers in the same computer, to find performance differences changing site settings / cache stores
 * Generate the data and run the tests
     + cd /path/to/moodle-performance-comparison
     + *./before_run_setup.sh {XS|S|M|L|XL|XXL}*
-    + Change site settings if necessary according to what you are comparing (you can overwrite the database dump if you don't want to set it again)
+    + Change site settings if necessary according to what you are comparing
     + *./restart_services.sh*
     + *./test_runner.sh* {groupname} {descriptioname}
     + *./after_run_setup.sh*
@@ -92,15 +98,27 @@ Note that you can run the tests as many times as you want, you just need to run 
     + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
 
 ### Web server and JMeter running from a different server
- Same process than when using a single computer but:
-
-* Configuring jmeter_config.properties in the server hosting JMeter and webserver_config.properties in the web server
-*  Running test_runner.sh in the server hosting JMeter and all other commands in the web server
-* JMeter needs to download the test plan and the test users from the web server, so rather than:
-    + *./test_runner.sh* {groupname} {descriptioname}
-* Do
+* Generate the data and the test plan (web server)
+    + *cd /path/to/moodle-performance-comparison*
+    + *./before_run_setup.sh {XS|S|M|L|XL|XXL}*
+    + Change site settings if necessary according to what you are comparing
+    + *./restart_services.sh*
+* Get the test plan files (jmeter server)
+    + *cd /path/to/moodle-performance-comparison*
     + *wget http://webserver/moodle/site/path/testusers.csv http://webserver/moodle/site/path/testplan.jmx*
+* Run the before test (jmeter server)
+    + *cd /path/to/moodle-performance-comparison*
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
+* Restore the base state to run the after branch (web server)
+    + *cd /path/to/moodle-performance-comparison*
+    + *./after_run_setup.sh*
+    + Change site settings if necessary according to what you are comparing
+    + *./restart_services.sh*
+* Run the after test (jmeter server)
+    + *cd /path/to/moodle-performance-comparison*
+    + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
+* Check the results (web server)
+    + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
 
 ### Using your own sql dump (Moodle 2.5 onwards)
 The installation and configuration is the same, it also depends on if you use the same computer for both web server and JMeter or not, but the usage changes when you want to use your own sql dump, it is not that easy to automate, as you need to specify which course do you want to use as target course and you can not use before_run_setup.sh to generate the test plan and test_files.properties.
