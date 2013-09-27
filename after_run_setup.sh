@@ -92,6 +92,9 @@ if [ "$upgradeexitcode" -ne "0" ]; then
     exit $upgradeexitcode
 fi
 
+# Returning to the root.
+cd ..
+
 # Info, all went as expected and we are all happy.
 outputinfo="
 #######################################################################
