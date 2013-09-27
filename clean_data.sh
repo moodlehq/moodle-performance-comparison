@@ -8,17 +8,26 @@
 #
 ##############################################
 
+# Dependencies.
+. ./lib/lib.sh
+
+# Get config.
+load_properties "webserver_config.properties"
+
 rm runs/*.php -rf
 rm runs_samples/*.jtl -rf
-rm runs_outputs/*.output
+rm runs_outputs/*.output -rf
 rm logs/*.log -rf
 
 # Also images cache.
 sudo rm cache -rf
 
+# Also backups.
+sudo rm $backupsdir/* -rf
+
 outputinfo="
 #######################################################################
-Runs results deleted successfully.
+Runs results and backups deleted successfully.
 "
 echo "$outputinfo"
 exit 0
