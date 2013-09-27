@@ -22,6 +22,8 @@
 # Get user info.
 load_properties "webserver_config.properties"
 
+timestart=`date +%s`
+
 # We need the size.
 if [ -z "$1" ]; then
     output="Usage: `basename $0` {size}
@@ -40,9 +42,20 @@ fi
 groupname="compare_"`date '+%Y%m%d%H%M'`
 
 ./before_run_setup.sh $1
-./test_runner.sh "$groupname" "before" -u 5 -l 5
+./test_runner.sh "$groupname" "before" -l 5
 ./after_run_setup.sh
-./test_runner.sh "$groupname" "after" -u 5 -l 5
+./test_runner.sh "$groupname" "after" -l 5
+
+timeend=`date +%s`
+
+# Output time elapsed.
+elapsedtime=$[$timeend - $timestart]
+show_elapsed_time $elapsedtime
+output="
+#######################################################################
+Comparison test finished successfully.
+"
+echo "$outputinfo"
 
 # Opens the comparison web interface in a browser.
 $browser "$wwwroot/../"
