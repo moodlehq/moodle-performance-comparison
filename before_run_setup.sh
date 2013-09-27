@@ -126,6 +126,7 @@ if [ "$installexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be installed"
     exit $installexitcode
 fi
+chmod 777 $dataroot/sessions -R
 
 # Generate courses.
 php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
