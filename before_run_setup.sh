@@ -126,7 +126,6 @@ if [ "$installexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be installed"
     exit $installexitcode
 fi
-chmod 777 $dataroot/sessions -R
 
 # Generate courses.
 php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
@@ -165,7 +164,7 @@ fi
 mv testplan* $filenametestplan
 mv users* $filenameusers
 
-# Backups
+# Backups.
 if [ ! -e "$backupsdir" ]; then
     mkdir -m $permissions $backupsdir
 fi
@@ -173,7 +172,8 @@ datesufix=`date '+%Y%m%d%H%M'`
 filenamedataroot="$backupsdir/dataroot_backup_$datesufix"
 filenamedatabase="$backupsdir/database_backup_$datesufix.sql"
 
-# Dataroot backup
+# Dataroot backup.
+rm -rf $dataroot/sessions
 cp -r $dataroot $filenamedataroot
 
 # Database backup.
