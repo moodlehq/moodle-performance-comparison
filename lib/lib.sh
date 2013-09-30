@@ -33,21 +33,32 @@ checkout_branch()
     git fetch $2 --quiet
 
     # Checking if it is a branch or a hash.
-    git show-ref --verify --quiet $3
+    git show-ref --verify --quiet refs/remotes/$2/$3
     if [ $? == "0" ]; then
 
         # Checkout the last version of the branch.
         git show-ref --verify --quiet refs/heads/$3
         if [ $? == "0" ]; then
-            # Deleting old local branch in case there are history changes so we avoid conflicts.
+            # Delete to avoid conflicts if there are git history changes.
             git checkout master --quiet
-            git branch -D $3 --quiet
+            if [ "$3" == "master" ]; then
+                # Master history is constant.
+                git rebase $2/master
+            else
+                git branch -D $3 --quiet
+                git checkout -b $3 $2/$3
+            fi
+        else
+            git checkout -b $3 $2/$3
         fi
-        git checkout -b $3 $2/$3
 
     else
         # Just checkout the hash.
         git checkout $3
+        if [ $? != "0" ]; then
+            echo "Error: The provided branch/hash can not be found."
+            exit 1
+        fi
     fi
 
 }
