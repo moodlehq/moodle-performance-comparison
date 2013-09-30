@@ -63,3 +63,7 @@ backupsdir="/your/directory/with/a/lot/of/free/space"
 # Note that this will only work in a limited set of systems as it uses system calls like "service $servicename restart"
 # You will need to restart the involved services manually.
 servicesarray=( apache2 mysql postgresql )
+
+# Path or alias of the browser you want to open the results with.
+# This setting is only useful when running compare.sh script.
+browser="firefox"
