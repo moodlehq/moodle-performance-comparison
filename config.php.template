@@ -39,10 +39,6 @@ $CFG->tool_generator_users_password = '%%toolgeneratorpassword%%';
 // Using file sessions.
 $CFG->dbsessions = false;
 
-// Disable session timemodified updates.
-// TODO: Remove this line, we should get consistent results by repeating tests, not by forcing settings.
-$CFG->session_update_timemodified_frequency = -99999;
-
 define('MDL_PERF', true);
 define('MDL_PERFDB', true);
 define('MDL_PERFTOLOG', true);
