@@ -320,14 +320,8 @@ function display_results(page $beforepage, page $afterpage) {
     foreach ($PROPERTIES as $PROPERTY) {
         $b = $before[$PROPERTY]['average'];
         $a = $after[$PROPERTY]['average'];
-        if ($b > 0 || $a > 0) {
-            if ($b > 0 && $a > 0) {
-                $p = round(($a / $b) * 100-100, 2);
-            } else if ($b > 0) {
-                $p = round(100 * $b, 2);
-            } else if ($a > 0) {
-                $p = round(100 * $a, 2);
-            }
+        if ($b > 0 && $a > 0) {
+            $p = round(($a / $b) * 100-100, 2);
             if ($p > 1) {
                 $color = '#83181F;';
                 $sign = '+';
