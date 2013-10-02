@@ -118,6 +118,10 @@ MoodleResult(JMeterContext ctx) {
     return this;
 }
 
+EscapeQuotes(String text) {
+    return text.replace("'", "\\'");
+}
+
 Runnable mr = MoodleResult(ctx);
 
 // Create the file.
@@ -134,16 +138,16 @@ if (!f.exists()) {
     out.write("<?php\n");
     out.write("$host = '"+vars.get("host")+"';\n");
     out.write("$sitepath = '"+vars.get("sitepath")+"';\n");
-    out.write("$group = '"+props.get("group")+"';\n");
-    out.write("$rundesc = '"+props.get("desc")+"';\n");
+    out.write("$group = '"+EscapeQuotes(props.get("group"))+"';\n");
+    out.write("$rundesc = '"+EscapeQuotes(props.get("desc"))+"';\n");
     out.write("$users = '"+vars.get("users")+"';\n");
     out.write("$loopcount = '"+vars.get("loops")+"';\n");
     out.write("$rampup = '"+vars.get("rampup")+"';\n");
     out.write("$throughput = '"+vars.get("throughput")+"';\n");
     out.write("$size = '"+vars.get("size")+"';\n");
-    out.write("$siteversion = '"+props.get("siteversion")+"';\n");
-    out.write("$sitebranch = '"+props.get("sitebranch")+"';\n");
-    out.write("$sitecommit = '"+props.get("sitecommit")+"';\n");
+    out.write("$siteversion = '"+EscapeQuotes(props.get("siteversion"))+"';\n");
+    out.write("$sitebranch = '"+EscapeQuotes(props.get("sitebranch"))+"';\n");
+    out.write("$sitecommit = '"+EscapeQuotes(props.get("sitecommit"))+"';\n");
     out.close();
 }
 
