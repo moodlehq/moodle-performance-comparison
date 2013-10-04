@@ -1,0 +1,21 @@
+body {
+    font-family: 'Arial';
+    font-size: 14px;
+    margin: 20px;
+}
+
+table {
+    border-style: solid;
+}
+
+h2 {
+    text-align: center;
+}
+
+.section {
+    margin-top: 50px;
+}
+
+table.container {
+    margin: 0 auto;
+}
