@@ -71,7 +71,7 @@ The installation process differs depending whether you have both the web server 
 
 ## Usage
 
-The simplest is to just execute *compare.sh {size}*, but it will only work in development computers where jmeter is installed in the web server and when you are testing differences between different branches. For other cases the process also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
+The simplest is to just execute *compare.sh*, but it will only work in development computers where jmeter is installed in the web server and when you are testing differences between different branches. For other cases the process also differs depending whether you have both web server and JMeter in the same computer or not. Here there is another alternative, you can load your sql dump instead of having a clean brand new site with a fixed dataset, so you can run the generated test plan using real site generated data.
 
 The groupname and description arguments of test_runner.sh are useful to identify the run when comparing results, you can use it to set the branch name, the settings you used or whatever will help you identify which run is it.
 
