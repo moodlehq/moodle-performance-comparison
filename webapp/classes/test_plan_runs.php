@@ -16,6 +16,21 @@ class test_plan_run {
     public static $runvars = array('dbreads', 'dbwrites', 'memoryused', 'filesincluded', 'serverload', 'sessionsize', 'timeused');
 
     /**
+     * @var array Params of a run. Not including the description nor timestamp.
+     */
+    public static $runparams = array(
+        'group' => 'Group',
+        'sitebranch' => 'Major Moodle branch',
+        'users' => 'Number of users',
+        'siteversion' => 'Version',
+        'sitecommit' => 'Commit',
+        'rampup' => 'Ramp-up period',
+        'size' => 'Size',
+        'loopcount' => 'Number of loops',
+        'throughput' => 'Throughput'
+    );
+
+    /**
      * @var stdClass Run data, including the threads results.
      */
     protected $rundata;
@@ -76,11 +91,11 @@ class test_plan_run {
 
         return $this->rundata->rundesc . ' - ' . $this->rundata->group . ', ' .
             $this->rundata->size . ' size, ' .
-            'Moodle ' . $this->rundata->sitebranch .
+            'Moodle ' . $this->rundata->sitebranch . ' ' .
             '(' . $this->rundata->siteversion . ', ' . $this->rundata->sitecommit . ') ' .
-            '(' . $this->rundata->users . 'users * ' . $this->rundata->loopcount . ' loops, ' .
+            '(' . $this->rundata->users . ' users * ' . $this->rundata->loopcount . ' loops, ' .
             'rampup=' . $this->rundata->rampup . ' throughput=' . $this->rundata->throughput . ')' .
-            $time;
+            ' ' . $time;
     }
 
     /**

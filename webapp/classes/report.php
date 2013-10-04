@@ -162,19 +162,44 @@ class report {
     public function get_run_files_info() {
 
         $runfiles = array();
+        $runsvalues = array();
 
         $dir = __DIR__ . '/../../' . self::RUNS_RELATIVE_PATH;
         if ($dh = opendir($dir)) {
             while (($filename = readdir($dh)) !== false) {
                 if ($filename != '.' && $filename != '..' && $filename != 'empty') {
                     $timestamp = preg_replace("/[^0-9]/","", $filename);
-                    $runfiles[] = new test_plan_run($timestamp);
+                    $runfiles[$timestamp] = new test_plan_run($timestamp);
+
+                    // Get the params for filtering.
+                    foreach (test_plan_run::$runparams as $param => $name) {
+                        $value = $runfiles[$timestamp]->get_run_info()->{$param};
+                        if (empty($runsvalues[$param])) {
+                            $runsvalues[$param] = array();
+                        }
+                        $runsvalues[$param][$value] = $value;
+                    }
+
+                    // Discard it if filters are set (once we got it's params).
+                    if (!empty($_GET['filters'])) {
+                        foreach ($_GET['filters'] as $param => $filteredvalue) {
+                            // Ensure it still exists.
+                            if (!empty($filteredvalue) && !empty($runfiles[$timestamp]) &&
+                                    $filteredvalue != $runfiles[$timestamp]->get_run_info()->{$param}) {
+                                unset($runfiles[$timestamp]);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             closedir($dh);
         }
 
-        return $runfiles;
+        // Ordering them by timestamp DESC.
+        asort($runfiles);
+
+        return array($runfiles, $runsvalues);
     }
 
     /**

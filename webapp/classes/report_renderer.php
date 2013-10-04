@@ -13,7 +13,7 @@ class report_renderer {
     protected $report;
 
     /**
-     * Adds the report data.
+     * Adds the report data
      *
      * @param report $report
      * @return void
@@ -53,10 +53,37 @@ class report_renderer {
      */
     protected function output_form() {
 
-        $runs = $this->report->get_run_files_info();
+        list($runs, $runsvalues) = $this->report->get_run_files_info();
+
+        // Filter runs form.
+        $output = '<form method="get">';
+        $fields = array();
+        foreach (test_plan_run::$runparams as $key => $name) {
+            $field = $name . ': <select id="id_' . $key . '" name="filters[' . $key . ']">';
+
+            // The options existing in the runs files.
+            $field .= '<option value="">(All options)</option>';
+            if ($runsvalues) {
+                foreach ($runsvalues[$key] as $value) {
+
+                    // The selected one if there is one.
+                    $selectedstr = '';
+                    if (!empty($_GET['filters'][$key]) && $_GET['filters'][$key] == $value) {
+                        $selectedstr = 'selected="selected"';
+                    }
+
+                    $field .= '<option value="' . $value . '" ' . $selectedstr . '>' . $value . '</option>';
+                }
+            }
+            $field .= '</select>';
+            $fields[] = $field;
+        }
+        $fields[] = '<input type="submit" value="Filter runs"/>';
+        $output .= $this->create_table('Filter runs', $fields, 3);
+        $output .= '</form>';
 
         // Select runs form.
-        $output = '<form method="get">';
+        $output .= '<form method="get">';
 
         // Restrict the select size.
         $sizestr = '';
@@ -67,13 +94,35 @@ class report_renderer {
             $sizestr = ' size="' . count($runs) . '" ';
         }
 
-        $output .= '<select name="timestamps[]" ' . $sizestr . ' multiple="multiple">' . PHP_EOL;
-        foreach ($runs as $run) {
-            $output .= '<option value="' . $run->get_run_info()->timestamp . '">' . $run->get_run_info_extended_string() . '</option>';
+        $runsselect = '<select name="timestamps[]" ' . $sizestr . ' multiple="multiple">' . PHP_EOL;
+        if ($runs) {
+            foreach ($runs as $run) {
+                $selectedstr = '';
+                if (!empty($_GET['timestamps']) && in_array($run->get_run_info()->timestamp, $_GET['timestamps'])) {
+                    $selectedstr = 'selected="selected"';
+                }
+                $runsselect .= '<option value="' . $run->get_run_info()->timestamp . '" ' . $selectedstr . '>' . $run->get_run_info_extended_string() . '</option>';
+            }
         }
-        $output .= '</select>';
+        $runsselect .= '</select>' . PHP_EOL;
 
-        $output .= '<br/><br/><input type="submit" value="View comparison"/>';
+        // Add a message if there are no runs.
+        if (!$runs) {
+            $link = 'https://github.com/moodlehq/moodle-performance-comparison/blob/master/README.md#usage';
+            $runsselect .= '<br/><br/>There are no runs, more info in <a href="' . $link . '" target="_blank">' . $link . '</a>';
+        }
+
+        // Keep the filter runs values if there is something filtered.
+        if (!empty($_GET['filters'])) {
+            foreach ($_GET['filters'] as $filter => $value) {
+                if (!empty($value)) {
+                    $runsselect .= '<input type="hidden" name="filters[' . $filter . ']" value="' . $value . '"/>';
+                }
+            }
+        }
+
+        $runsselect .= '<br/><br/><input type="submit" value="View comparison"/>';
+        $output .= $this->create_table('Select runs', array($runsselect), 1);
         $output .= '</form>';
         return $output;
     }
