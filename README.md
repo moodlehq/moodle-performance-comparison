@@ -78,8 +78,8 @@ The groupname and description arguments of test_runner.sh are useful to identify
 Note that you can run the tests as many times as you want, you just need to run after_run_setup.sh and restart_services.sh before running test_runner.sh every time to clean up the site.
 
 ### Web and JMeter servers in the same computer, to find performance differences between different branches (usually a development computer)
-* Run compare.sh specifying the size of the test, the browser will be automatically opened after both runs are finished
-    + ./compare.sh {size}
+* Run compare.sh, the browser will be automatically opened after both runs are finished
+    + ./compare.sh
 * In case the browser doesn't open properly the comparison page, browse to
     + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
 
