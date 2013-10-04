@@ -33,6 +33,14 @@ class report_renderer {
         echo $this->output_form();
         echo $this->output_runs_info();
         echo $this->output_charts_containers();
+
+        // Link to Sam's tool with detailed data (just the first 2 runs).
+        if (!empty($_GET['timestamps']) && count($_GET['timestamps']) >= 2) {
+            $urlparams = 'before=' . $_GET['timestamps'][1] . '&after=' . $_GET['timestamps'][0];
+            echo '<div class="switchtool"><a href="details.php?' . $urlparams . '" target="_blank">See numeric info</a></div>';
+        }
+
+
     }
 
     /**
@@ -124,6 +132,7 @@ class report_renderer {
         $runsselect .= '<br/><br/><input type="submit" value="View comparison"/>';
         $output .= $this->create_table('Select runs', array($runsselect), 1);
         $output .= '</form>';
+
         return $output;
     }
 
