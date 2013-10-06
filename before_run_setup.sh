@@ -29,27 +29,36 @@ filenameusers="$currentwd/moodle/testusers.csv"
 filenametestplan="$currentwd/moodle/testplan.jmx"
 permissions=777
 
-# The target course according to the selected size.
-declare -A sizecourse
-sizecourse['XS']='testcourse_3'
-sizecourse['S']='testcourse_12'
-sizecourse['M']='testcourse_73'
-sizecourse['L']='testcourse_277'
-sizecourse['XL']='testcourse_1065'
-sizecourse['XXL']='testcourse_4177'
-
-# We need the size.
-if [ -z "$1" ]; then
-    output="Usage: `basename $0` {size}
+# Validate the passed size ($1)
+case "$1" in
+    'XS')
+        targetcourse='testcourse_3'
+        ;;
+     'S')
+        targetcourse='testcourse_12'
+        ;;
+     'M')
+        targetcourse='testcourse_73'
+        ;;
+     'L')
+        targetcourse='testcourse_277'
+        ;;
+    'XL')
+        targetcourse='testcourse_1065'
+        ;;
+   'XXL')
+        targetcourse='testcourse_4177'
+        ;;
+       *)
+        echo "Usage: `basename $0` {size}
 
 Sets up a moodle site with courses and users and generates a JMeter test plan.
 
 Arguments:
 * $1 => Size, one of the following options: XS, S, M, L, XL, XXL. More than 'M' is not recommended in development computers.
 "
-    echo "$output"
-    exit 1
-fi
+        exit 1
+esac
 
 # Get user info.
 load_properties "webserver_config.properties"
@@ -74,11 +83,12 @@ fi
 
 # Creating new database and delete it if it already exists.
 if [ "$dbtype" == "pgsql" ]; then
-    psql -h "$dbhost" -U "$dbuser" -c "DROP DATABASE $dbname" 2> /dev/null
-    psql -h "$dbhost" -U "$dbuser" -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
+    export PGPASSWORD=${dbpass}
+    psql -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null
+    psql -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
 elif [ "$dbtype" == "mysqli" ]; then
-    mysql -h "$dbhost" -u "$dbuser" -p -e "DROP DATABASE $dbname" 2> /dev/null
-    mysql -h "$dbhost" -u "$dbuser" -p -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
+    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" 2> /dev/null
+    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
 else
     confirmoutput="Only postgres and mysql support: You need to manually create your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -144,7 +154,7 @@ if [ "$setsiteexitcode" -ne "0" ]; then
 fi
 
 # We capture the output to get the files we will need.
-testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${sizecourse[$1]}' --bypasscheck'$debug
+testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck'$debug
 testplanfiles="$(${testplancommand})"
 # We only get the first two items as there is more performance info.
 if [[ "$testplanfiles" == *"testplan"* ]]; then
@@ -178,9 +188,10 @@ cp -r $dataroot $filenamedataroot
 
 # Database backup.
 if [ "$dbtype" == "pgsql" ]; then
+    export PGPASSWORD=${dbpass}
     pg_dump -h "$dbhost" -U "$dbuser" $dbname > $filenamedatabase
 elif [ "$dbtype" == "mysqli" ]; then
-    mysqldump -h "$dbhost" -u "$dbuser" -p $dbname > $filenamedatabase
+    mysqldump --host=${dbhost} --user=${dbuser} --password=${dbpass} ${dbname} > $filenamedatabase
 else
     echo "Only postgres and mysql backup/restore support, you will have to backup it manually."
     $filenamedatabase='NOT AVAILABLE'

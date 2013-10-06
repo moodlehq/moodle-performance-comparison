@@ -46,4 +46,8 @@ Comparison test finished successfully.
 echo "$outputinfo"
 
 # Opens the comparison web interface in a browser.
-$browser "$wwwroot/../"
+if [[ "$OSTYPE" == "darwin"* ]];then
+    open -a $browser "$wwwroot/../"
+else
+    $browser "$wwwroot/../"
+fi
