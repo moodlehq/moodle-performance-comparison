@@ -64,14 +64,15 @@ chmod 777 $dataroot -R
 # Drop and restore the database.
 if [ "$dbtype" == "pgsql" ]; then
     echo "Creating $dbname database"
-    psql -h "$dbhost" -U "$dbuser" -c "DROP DATABASE $dbname"
-    psql -h "$dbhost" -U "$dbuser" -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
+    export PGPASSWORD=${dbpass}
+    psql -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname"
+    psql -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
     psql -h "$dbhost" -U "$dbuser" $dbname < $databasebackup
 elif [ "$dbtype" == "mysqli" ]; then
     echo "Creating $dbname database"
-    mysql -h "$dbhost" -u "$dbuser" -e "DROP DATABASE $dbname"
-    mysql -h "$dbhost" -u "$dbuser" -p -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
-    mysql -h "$dbhost" -u "$dbuser" $dbname < $databasebackup
+    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname"
+    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
+    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup
 else
     confirmoutput="Only postgres and mysql support: You need to manually restore your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
