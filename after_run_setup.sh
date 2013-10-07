@@ -65,14 +65,14 @@ chmod 777 $dataroot -R
 if [ "$dbtype" == "pgsql" ]; then
     echo "Creating $dbname database"
     export PGPASSWORD=${dbpass}
-    psql -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname"
-    psql -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
-    psql -h "$dbhost" -U "$dbuser" $dbname < $databasebackup
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname"
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" $dbname < $databasebackup
 elif [ "$dbtype" == "mysqli" ]; then
     echo "Creating $dbname database"
-    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname"
-    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
-    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname"
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup
 else
     confirmoutput="Only postgres and mysql support: You need to manually restore your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -86,7 +86,7 @@ fi
 
 # Upgrading moodle, although we are not sure that before and after branches are different.
 checkout_branch $repository 'origin' $afterbranch
-php admin/cli/upgrade.php --non-interactive --allow-unstable
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be upgraded to $afterbranch"

@@ -19,42 +19,42 @@ checkout_branch()
 {
     # Getting the code.
     if [ ! -e ".git" ]; then
-        git init
+        ${gitcmd} init
     fi
 
     # rm + add as it can change.
     # Only if it exists.
-    git ls-remote $2 --quiet 2> /dev/null
+    ${gitcmd} ls-remote $2 --quiet 2> /dev/null
     if [ "$?" == "0" ]; then
-        git remote rm $2
+        ${gitcmd} remote rm $2
     fi
-    git remote add $2 $1
+    ${gitcmd} remote add $2 $1
 
-    git fetch $2 --quiet
+    ${gitcmd} fetch $2 --quiet
 
     # Checking if it is a branch or a hash.
-    git show-ref --verify --quiet refs/remotes/$2/$3
+    ${gitcmd} show-ref --verify --quiet refs/remotes/$2/$3
     if [ $? == "0" ]; then
 
         # Checkout the last version of the branch.
-        git show-ref --verify --quiet refs/heads/$3
+        ${gitcmd} show-ref --verify --quiet refs/heads/$3
         if [ $? == "0" ]; then
             # Delete to avoid conflicts if there are git history changes.
-            git checkout master --quiet
+            ${gitcmd} checkout master --quiet
             if [ "$3" == "master" ]; then
                 # Master history is constant.
-                git rebase $2/master
+                ${gitcmd} rebase $2/master
             else
-                git branch -D $3 --quiet
-                git checkout -b $3 $2/$3
+                ${gitcmd} branch -D $3 --quiet
+                ${gitcmd} checkout -b $3 $2/$3
             fi
         else
-            git checkout -b $3 $2/$3
+            ${gitcmd} checkout -b $3 $2/$3
         fi
 
     else
         # Just checkout the hash.
-        git checkout $3
+        ${gitcmd} checkout $3
         if [ $? != "0" ]; then
             echo "Error: The provided branch/hash can not be found."
             exit 1
