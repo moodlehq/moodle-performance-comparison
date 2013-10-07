@@ -39,10 +39,12 @@ $CFG->tool_generator_users_password = '%%toolgeneratorpassword%%';
 // Using file sessions.
 $CFG->dbsessions = false;
 
-define('MDL_PERF', true);
-define('MDL_PERFDB', true);
-define('MDL_PERFTOLOG', true);
-define('MDL_PERFTOFOOT', true);
+if (!defined('CLI_SCRIPT')) {
+    define('MDL_PERF', true);
+    define('MDL_PERFDB', true);
+    define('MDL_PERFTOLOG', true);
+    define('MDL_PERFTOFOOT', true);
+}
 
 $CFG->directorypermissions = 0777;
 
