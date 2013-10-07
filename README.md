@@ -34,8 +34,11 @@ adaptation to run Moodle's *tool_generator* test plans.
 
 
 ## Requirements
-* JMeter - http://jmeter.apache.org/
-
+* MySQL or PostgreSQL
+* Git
+* cURL
+* PHP 5.3
+* JMeter - https://jmeter.apache.org/download_jmeter.cgi (probably you will face problems using apt-get or other package management systems to download it)
 
 ## Installation
 
@@ -105,7 +108,7 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *./restart_services.sh*
 * Get the test plan files (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
-    + *wget http://webserver/moodle/site/path/testusers.csv http://webserver/moodle/site/path/testplan.jmx*
+    + *curl -O http://webserver/moodle/site/path/testusers.csv -O http://webserver/moodle/site/path/testplan.jmx*
 * Run the before test (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
     + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
@@ -134,8 +137,8 @@ The installation and configuration is the same, it also depends on if you use th
 * Generate the test plan updating users passwords. You need to provide the shortname of the course that will be tested
     + *php admin/tool/generator/cli/maketestplan.php --size="THESIZEYOUWANT" --shortname="TARGETCOURSESHORTNAME" --bypasscheck --updateuserspassword*
 * Download the test plan and the test users. The URLs are provided by maketestsite.php in the previous step, before the performance info output begins.
-    + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/testplan_NNNNNNNNNNNN_NNNN.jmx -O testplan.jmx*
-    + *wget http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/users_NNNNNNNNNNNN_NNNN.jmx -O testusers.csv*
+    + *curl -o testplan.jmx http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/testplan_NNNNNNNNNNNN_NNNN.jmx*
+    + *curl -o testusers.csv http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/users_NNNNNNNNNNNN_NNNN.jmx*
 * Backup dataroot and database (pg_dump or mysqldump), this backup will contain the updated passwords
 * Create moodle-performance-comparison/test_files.properties with the backups you just generated and the test plan data
     + *cd ../*
