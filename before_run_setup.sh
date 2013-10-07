@@ -84,11 +84,11 @@ fi
 # Creating new database and delete it if it already exists.
 if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
-    psql -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null
-    psql -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
 elif [ "$dbtype" == "mysqli" ]; then
-    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" 2> /dev/null
-    mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" 2> /dev/null
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
 else
     confirmoutput="Only postgres and mysql support: You need to manually create your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -130,7 +130,7 @@ fi
 chmod $permissions config.php
 
 # Install the site with user specified params.
-php admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" $debug
+${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" $debug
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be installed"
@@ -138,7 +138,7 @@ if [ "$installexitcode" -ne "0" ]; then
 fi
 
 # Generate courses.
-php admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
+${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
 testsiteexitcode=$?
 if [ "$testsiteexitcode" -ne "0" ]; then
     echo "Error: The test site can not be generated"
@@ -146,7 +146,7 @@ if [ "$testsiteexitcode" -ne "0" ]; then
 fi
 
 # Enable advanced settings and list courses in the frontpage.
-php ../set_moodle_site.php
+${phpcmd} ../set_moodle_site.php
 setsiteexitcode=$?
 if [ "$setsiteexitcode" -ne "0" ]; then
     echo "Error: The test site can not be configured"
@@ -154,16 +154,16 @@ if [ "$setsiteexitcode" -ne "0" ]; then
 fi
 
 # We capture the output to get the files we will need.
-testplancommand='php admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck'$debug
+testplancommand=${phpbin}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck'$debug
 testplanfiles="$(${testplancommand})"
 # We only get the first two items as there is more performance info.
 if [[ "$testplanfiles" == *"testplan"* ]]; then
     if [ -z "$debug" ]; then
-        wgetoutput=""
+        curloutput=""
     else
-        wgetoutput=" -o /dev/null"
+        curloutput=" -o /dev/null"
     fi
-    wget $testplanfiles $wgetoutput
+    curl -o $curloutput $testplanfiles
 else
     echo "Error: There was a problem generating the test plan."
     exit 1
@@ -189,9 +189,9 @@ cp -r $dataroot $filenamedataroot
 # Database backup.
 if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
-    pg_dump -h "$dbhost" -U "$dbuser" $dbname > $filenamedatabase
+    ${pgsqldumpcmd} -h "$dbhost" -U "$dbuser" $dbname > $filenamedatabase
 elif [ "$dbtype" == "mysqli" ]; then
-    mysqldump --host=${dbhost} --user=${dbuser} --password=${dbpass} ${dbname} > $filenamedatabase
+    ${mysqldumpcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} ${dbname} > $filenamedatabase
 else
     echo "Only postgres and mysql backup/restore support, you will have to backup it manually."
     $filenamedatabase='NOT AVAILABLE'
@@ -207,7 +207,7 @@ echo "$generatedfiles" > "$currentwd/test_files.properties"
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
 checkout_branch $repository 'origin' $beforebranch
-php admin/cli/upgrade.php --non-interactive --allow-unstable
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be upgraded to $beforebranch"
