@@ -14,7 +14,6 @@
 ##############################################
 
 #set -e
-debug=" > /dev/null 2>&1"
 
 # Dependencies.
 . ./lib/lib.sh
@@ -84,11 +83,11 @@ fi
 # Creating new database and delete it if it already exists.
 if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
-    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null
-    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'"
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null --quiet
+    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
 elif [ "$dbtype" == "mysqli" ]; then
-    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" 2> /dev/null
-    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci"
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" --silent
 else
     confirmoutput="Only postgres and mysql support: You need to manually create your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -130,7 +129,9 @@ fi
 chmod $permissions config.php
 
 # Install the site with user specified params.
-${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" $debug
+echo "#######################################################################"
+echo "Installing Moodle ($basecommit)"
+${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" > /dev/null
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be installed"
@@ -138,7 +139,7 @@ if [ "$installexitcode" -ne "0" ]; then
 fi
 
 # Generate courses.
-${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" $debug
+${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" --quiet > /dev/null
 testsiteexitcode=$?
 if [ "$testsiteexitcode" -ne "0" ]; then
     echo "Error: The test site can not be generated"
@@ -154,25 +155,21 @@ if [ "$setsiteexitcode" -ne "0" ]; then
 fi
 
 # We capture the output to get the files we will need.
-testplancommand=${phpbin}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck'$debug
+testplancommand=${phpcmd}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck' > /dev/null
 testplanfiles="$(${testplancommand})"
 # We only get the first two items as there is more performance info.
 if [[ "$testplanfiles" == *"testplan"* ]]; then
-    if [ -z "$debug" ]; then
-        curloutput=""
-    else
-        curloutput=" -o /dev/null"
+    # Prepare curl arguments.
+    files=( $testplanfiles )
+    if [ "${#files[*]}" -ne 2 ]; then
+        echo "Error: There was a problem generating the test plan."
+        exit 1
     fi
-    curl -o $curloutput $testplanfiles
+    ${curlcmd} -o $filenametestplan ${files[0]} -o $filenameusers ${files[1]} --silent
 else
     echo "Error: There was a problem generating the test plan."
     exit 1
 fi
-
-# Yeah baby, we are bad ass; if we run it every time there will always be just one file changed.
-# We need hardcoded filenames to access them easily from other scripts or CI servers jobs.
-mv testplan* $filenametestplan
-mv users* $filenameusers
 
 # Backups.
 if [ ! -e "$backupsdir" ]; then
@@ -183,6 +180,7 @@ filenamedataroot="$backupsdir/dataroot_backup_$datesufix"
 filenamedatabase="$backupsdir/database_backup_$datesufix.sql"
 
 # Dataroot backup.
+echo "Creating Moodle ($basecommit) database and dataroot backups"
 rm -rf $dataroot/sessions
 cp -r $dataroot $filenamedataroot
 
@@ -206,8 +204,9 @@ databasebackup=$filenamedatabase"
 echo "$generatedfiles" > "$currentwd/test_files.properties"
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
+echo "Upgrading Moodle ($basecommit) to $beforebranch"
 checkout_branch $repository 'origin' $beforebranch
-${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then
     echo "Error: Moodle can not be upgraded to $beforebranch"

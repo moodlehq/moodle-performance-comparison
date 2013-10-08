@@ -48,7 +48,7 @@ MoodleResult(JMeterContext ctx) {
     }
 
     String sessionsize = "0";
-    Pattern psessionsize = Pattern.compile(".*?Session: (\\d+(\\.\\d+)?[A-Z]{2}).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Pattern psessionsize = Pattern.compile(".*?Session[^:]*: (\\d+(\\.\\d+)?[A-Z]{2}).*", Pattern.UNIX_LINES | Pattern.DOTALL);
     Matcher msessionsize = psessionsize.matcher(html);
     if (msessionsize.matches()) {
         sessionsize = msessionsize.group(1);

@@ -17,14 +17,15 @@ load_properties()
 # $1 = repo, $2 = remote alias, $3 = branch
 checkout_branch()
 {
+
     # Getting the code.
     if [ ! -e ".git" ]; then
-        ${gitcmd} init
+        ${gitcmd} init --quiet
     fi
 
     # rm + add as it can change.
     # Only if it exists.
-    ${gitcmd} ls-remote $2 --quiet 2> /dev/null
+    ${gitcmd} ls-remote $2 --quiet
     if [ "$?" == "0" ]; then
         ${gitcmd} remote rm $2
     fi
@@ -43,18 +44,26 @@ checkout_branch()
             ${gitcmd} checkout master --quiet
             if [ "$3" == "master" ]; then
                 # Master history is constant.
-                ${gitcmd} rebase $2/master
+                ${gitcmd} rebase $2/master --quiet 2> /dev/null
+
+                # In case there was a repository change master can be completely different.
+                if [ $? != "0" ]; then
+                    ${gitcmd} rebase --abort
+                    ${gitcmd} checkout $2/master --quiet
+                    ${gitcmd} branch -D master --quiet
+                    ${gitcmd} checkout master --quiet
+                fi
             else
                 ${gitcmd} branch -D $3 --quiet
-                ${gitcmd} checkout -b $3 $2/$3
+                ${gitcmd} checkout -b $3 $2/$3 --quiet
             fi
         else
-            ${gitcmd} checkout -b $3 $2/$3
+            ${gitcmd} checkout -b $3 $2/$3 --quiet
         fi
 
     else
         # Just checkout the hash.
-        ${gitcmd} checkout $3
+        ${gitcmd} checkout $3 --quiet
         if [ $? != "0" ]; then
             echo "Error: The provided branch/hash can not be found."
             exit 1

@@ -126,6 +126,7 @@ sitecommit="$(git show --oneline | head -n 1)"
 cd ..
 
 # Run it baby! (without GUI).
+echo "#######################################################################"
 echo "Test running... (time for a coffee?)"
 jmeterbin=$jmeter_path/bin/jmeter
 $jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $users $loops $rampup $throughput > $runoutput
@@ -136,6 +137,8 @@ if [ "$jmeterexitcode" -ne "0" ]; then
     echo "* You provide correct arguments to the script"
     exit $jmeterexitcode
 fi
+
+# TODO Looking for exceptions in the jmeter logs
 
 outputinfo="
 #######################################################################

@@ -82,7 +82,10 @@ class report {
      */
     public function make(array $timestamps) {
 
+        krsort($timestamps);
+
         foreach ($timestamps as $timestamp) {
+
             if (!is_numeric($timestamp)) {
                 die('Timestamps are supposed to be [0-9], cheater!');
             }
@@ -197,7 +200,7 @@ class report {
         }
 
         // Ordering them by timestamp DESC.
-        asort($runfiles);
+        krsort($runfiles);
 
         return array($runfiles, $runsvalues);
     }
