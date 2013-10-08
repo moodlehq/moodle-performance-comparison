@@ -36,6 +36,11 @@ class test_plan_run {
     protected $rundata;
 
     /**
+     * @var string The run file name.
+     */
+    protected $filename;
+
+    /**
      * @var array An array step-and-var-based (eg: [dbreads][Login]).
      */
     protected $totalsums = array();
@@ -59,6 +64,20 @@ class test_plan_run {
      */
     public function __construct($timestamp) {
         $this->rundata = $this->include_run($timestamp);
+    }
+
+    /**
+     * Returns the run filename.
+     * @param bool $includeextension
+     * @return string
+     */
+    public function get_filename($includeextension = true) {
+
+        if (!$includeextension) {
+            return basename($this->filename, '.php');
+        }
+
+        return $this->filename;
     }
 
     /**
@@ -184,10 +203,10 @@ class test_plan_run {
      */
     protected function include_run($timestamp) {
 
-        $filename = $timestamp . '.php';
-        $filepath = __DIR__ . '/../../' . report::RUNS_RELATIVE_PATH . $filename;
+        $this->filename = $timestamp . '.php';
+        $filepath = __DIR__ . '/../../' . report::RUNS_RELATIVE_PATH . $this->filename;
         if (!file_exists($filepath)) {
-            die('The selected file "' . $filename . '" does not exists');
+            die('The selected file "' . $this->filename . '" does not exists');
         }
 
         include($filepath);
@@ -202,7 +221,8 @@ class test_plan_run {
         foreach ($runinfovars as $var) {
             $rundata->{$var} = $$var;
         }
-        $rundata->timestamp = $timestamp;
+        // Removing miliseconds.
+        $rundata->timestamp = substr($timestamp, 0, 10);
         $rundata->results = $results;
 
         return $rundata;

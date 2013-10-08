@@ -27,12 +27,28 @@ groupname="compare_"`date '+%Y%m%d%H%M'`
 
 # Hardcoding S as the size, with 5 loops is enough to have consistent results.
 ./before_run_setup.sh S
+if [ "$?" -ne "0" ]; then
+    exit 1
+fi
+
 ./test_runner.sh "$groupname" "before" -l 5
+if [ "$?" -ne "0" ]; then
+    exit 1
+fi
+
 # We don't restart the browser here, this is a development machine
 # and probably you are not staring at the CLI waiting for it to
 # finish.
+
 ./after_run_setup.sh
+if [ "$?" -ne "0" ]; then
+    exit 1
+fi
+
 ./test_runner.sh "$groupname" "after" -l 5
+if [ "$?" -ne "0" ]; then
+    exit 1
+fi
 
 timeend=`date +%s`
 

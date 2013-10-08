@@ -109,7 +109,7 @@ class report_renderer {
                 if (!empty($_GET['timestamps']) && in_array($run->get_run_info()->timestamp, $_GET['timestamps'])) {
                     $selectedstr = 'selected="selected"';
                 }
-                $runsselect .= '<option value="' . $run->get_run_info()->timestamp . '" ' . $selectedstr . '>' . $run->get_run_info_extended_string() . '</option>';
+                $runsselect .= '<option value="' . $run->get_filename(false) . '" ' . $selectedstr . '>' . $run->get_run_info_extended_string() . '</option>';
             }
         }
         $runsselect .= '</select>' . PHP_EOL;
