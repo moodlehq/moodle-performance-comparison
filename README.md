@@ -29,9 +29,6 @@ There are scripts for both the web server and the JMeter server sides.
     + test_runner.sh along with jmeter_config.properties will be used in the server hosting JMeter
     + before_run_setup.sh, after_run_setup.sh and restart_services.sh will be used in the web server
 
-Most of the code to display the tests results comes from Sam Hemelryk's tool (https://github.com/samhemelryk/moodle-jmeter-perfcomp) this is an
-adaptation to run Moodle's *tool_generator* test plans.
-
 
 ## Requirements
 * MySQL or PostgreSQL
@@ -109,17 +106,23 @@ Note that you can run the tests as many times as you want, you just need to run 
 * Get the test plan files (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
     + *curl -O http://webserver/moodle/site/path/testusers.csv -O http://webserver/moodle/site/path/testplan.jmx*
+* Get the $beforebranch moodle version data (jmeter server)
+    + *cd /path/to/moodle-performance-comparison*
+    + *curl -O http://webserver/moodle/site/path/site_data.properties*
 * Run the before test (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
-    + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
+    + *./test_runner.sh {groupname} {descriptioname} testusers.csv testplan.jmx site_data.properties*
 * Restore the base state to run the after branch (web server)
     + *cd /path/to/moodle-performance-comparison*
     + *./after_run_setup.sh*
     + Change site settings if necessary according to what you are comparing
     + *./restart_services.sh*
+* Get the $afterbranch moodle version data (jmeter server)
+    + *cd /path/to/moodle-performance-comparison*
+    + *curl -O http://webserver/moodle/site/path/site_data.properties*
 * Run the after test (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
-    + *./test_runner.sh* {groupname} {descriptioname} testusers.csv testplan.jmx
+    + *./test_runner.sh {groupname} {descriptioname} testusers.csv testplan.jmx site_data.properties*
 * Check the results (web server)
     + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
 
@@ -136,7 +139,11 @@ The installation and configuration is the same, it also depends on if you use th
     + *php admin/cli/upgrade.php --allow-unstable --non-interactive*
 * Generate the test plan updating users passwords. You need to provide the shortname of the course that will be tested
     + *php admin/tool/generator/cli/maketestplan.php --size="THESIZEYOUWANT" --shortname="TARGETCOURSESHORTNAME" --bypasscheck --updateuserspassword*
+* Generate the site_data.properties file, with the current moodle version data, in the root directory of moodle-performance-comparison
+    + *cd ..*
+    + *./create_site_data_file.sh*
 * Download the test plan and the test users. The URLs are provided by maketestsite.php in the previous step, before the performance info output begins.
+    + *cd moodle/*
     + *curl -o testplan.jmx http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/testplan_NNNNNNNNNNNN_NNNN.jmx*
     + *curl -o testusers.csv http://webserver/url/provided/by/maketestsite.php/in/the/previous/step/users_NNNNNNNNNNNN_NNNN.jmx*
 * Backup dataroot and database (pg_dump or mysqldump), this backup will contain the updated passwords
@@ -160,6 +167,9 @@ Moodle 2.5 introduces the site and the test plan generators, so you can not use 
     + The test plan template is located in *admin/tool/generator/testplan.template.jmx*
 * Fill a testusers.php with the target course data
     + You will need to check that the test data has enough users according to the data you provided in the test plan
+* Generate the site_data.properties file, with the current moodle version data, in the root directory of moodle-performance-comparison
+    + *cd ..*
+    + *./create_site_data_file.sh*
 * Follow [Using your own sql dump (Moodle 2.5 onwards)](#using-your-own-sql-dump-moodle-25-onwards) instructions 
 
 
