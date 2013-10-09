@@ -73,9 +73,38 @@ checkout_branch()
 }
 
 # Shows the time elapsed in hours, mins and secs.
-show_elapsed_time() {
+show_elapsed_time()
+{
     ((h=${1}/3600))
     ((m=(${1}%3600)/60))
     ((s=${1}%60))
     printf "Elapsed time: %02d:%02d:%02d\n" $h $m $s
+}
+
+# Creates a file with data about the site. Requires scripts to 
+# move to moodle/ before calling it and returning to root if necessary.
+save_moodle_site_data()
+{
+
+    # We should already be in moodle/.
+    if [ ! -f "version.php" ]; then
+        echo "Error: save_moodle_site_data() should only be called after cd to moodle/"
+        exit 1
+    fi
+
+    # Getting the current site data.
+    siteversion="$(cat version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
+    sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+')"
+    sitecommit="$(git show --oneline | head -n 1)"
+
+    sitedatacontents="siteversion=\"$siteversion\"
+sitebranch=\"$sitebranch\"
+sitecommit=\"$sitecommit\""
+
+    echo "${sitedatacontents}" > site_data.properties
+    permissionsexitcode=$?
+    if [ "$permissionsexitcode" -ne "0" ]; then
+        echo "Error: Site data properties file can not be written, check $currentwd/moodle directory permissions."
+        exit $permissionsexitcode
+    fi
 }

@@ -16,6 +16,7 @@
 # * $2 => The run description, useful to identify the changes between runs.
 # * $3 => The test plan file path
 # * $4 => The path to the file with user's login data
+# * $5 => The path to the file with the tested site data
 #
 # Options:
 # * -u => Force the number of users (threads)
@@ -79,6 +80,7 @@ while [ $# -gt 0 ]; do
                 shift
             fi
 
+            # When JMeter is in another server we need extra files.
             if [ ! -z "$1" ] && [ -z "$testplanarg" ] && [ "${1:0:1}" != "-" ]; then
                 testplanarg=$1
                 shift
@@ -88,17 +90,35 @@ while [ $# -gt 0 ]; do
                 testusersfilearg=$1
                 shift
             fi
+
+            if [ ! -z "$1" ] && [ -z "$sitedatafilearg" ] && [ "${1:0:1}" != "-" ]; then
+                sitedatafilearg=$1
+                shift
+            fi
             ;;
     esac
 done
 
 # We give priority to the ones that comes as arguments.
 if [ ! -z "$testplanarg" ]; then
-    $testplanfile = $testplanarg
+    testplanfile=$testplanarg
 fi
 if [ ! -z "$testusersfilearg" ]; then
-    $testusersfile = $testusersfilearg
+    testusersfile=$testusersfilearg
 fi
+
+# Load the site data.
+# Defaults when jmeter is running in the same server than the web server.
+sitedatafile="moodle/site_data.properties"
+if [ ! -z "$sitedatafilearg" ]; then
+    sitedatafile=$sitedatafilearg
+fi
+if [ ! -e "$sitedatafile" ]; then
+    echo "Error: The specified site data properties file does not exist."
+    exit 1
+fi
+load_properties $sitedatafile
+
 
 # If there is no test_files.properties and no files were provided we throw an error.
 if [ -z "$testplanfile" ] || [ -z "$testusersfile" ]; then
@@ -117,13 +137,6 @@ fi
 datestring=`date '+%Y%m%d%H%M'`
 logfile="logs/jmeter.$datestring.log"
 runoutput="runs_outputs/$datestring.output"
-
-# Getting the current site data.
-cd moodle
-siteversion="$(cat version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
-sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+')"
-sitecommit="$(git show --oneline | head -n 1)"
-cd ..
 
 # Run it baby! (without GUI).
 echo "#######################################################################"

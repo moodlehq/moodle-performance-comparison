@@ -213,6 +213,9 @@ if [ "$upgradeexitcode" -ne "0" ]; then
     exit $upgradeexitcode
 fi
 
+# Stores the site data in an jmeter-accessible file.
+save_moodle_site_data
+
 # Returning to the root.
 cd ..
 
