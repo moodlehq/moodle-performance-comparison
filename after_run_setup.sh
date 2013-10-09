@@ -68,13 +68,13 @@ if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
     ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" --quiet
     ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
-    ${pgsqlcmd} --quiet -h "$dbhost" -U "$dbuser" $dbname < $databasebackup
+    ${pgsqlcmd} --quiet -h "$dbhost" -U "$dbuser" $dbname < $databasebackup > /dev/null
 elif [ "$dbtype" == "mysqli" ]; then
     echo "#######################################################################"
     echo "Restoring database and dataroot to Moodle ($basecommit)"
     ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
     ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" --silent
-    ${mysqlcmd} --silent --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup
+    ${mysqlcmd} --silent --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup > /dev/null
 else
     confirmoutput="Only postgres and mysql support: You need to manually restore your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
