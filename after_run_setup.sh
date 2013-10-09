@@ -57,6 +57,10 @@ load_properties "test_files.properties"
 cd moodle
 
 # Remove current dataroot and restore the provided one (Better using chown...).
+if [ ! -d "$dataroot" ] || [ -z "$dataroot" ]; then
+    echo "Error: Armageddon prevented just 2 lines of code above a rm -rf. Please, assign a value to \$dataroot var in webserver_config.properties"
+    exit 1
+fi
 rm $dataroot -rf
 cp -r $datarootbackup $dataroot
 chmod 777 $dataroot -R

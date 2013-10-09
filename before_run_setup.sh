@@ -65,10 +65,20 @@ load_properties "webserver_config.properties"
 # Creating & cleaning dirroot & dataroot (keeping .git)
 if [ ! -e "$dataroot" ]; then
     mkdir -m $permissions $dataroot
+    mkdirexitcode=$?
+    if [ "$mkdirexitcode" -ne "0" ]; then
+        echo "Error: There was a problem creating $dataroot directory"
+        exit $mkdirexitcode
+    fi
 fi
 rm $dataroot/* -rf
 if [ ! -e "moodle" ]; then
     mkdir -m $permissions "moodle"
+    mkdirexitcode=$?
+    if [ "$mkdirexitcode" -ne "0" ]; then
+        echo "Error: There was a problem creating moodle/ directory"
+        exit $mkdirexitcode
+    fi
 fi
 
 # Cleaning previous test plan files.
@@ -174,6 +184,12 @@ fi
 # Backups.
 if [ ! -e "$backupsdir" ]; then
     mkdir -m $permissions $backupsdir
+    mkdirexitcode=$?
+    if [ "$mkdirexitcode" -ne "0" ]; then
+        echo "Error: There was a problem creating $backupsdir directory"
+        exit $mkdirexitcode
+    fi
+
 fi
 datesufix=`date '+%Y%m%d%H%M'`
 filenamedataroot="$backupsdir/dataroot_backup_$datesufix"
