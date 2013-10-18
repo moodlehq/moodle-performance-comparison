@@ -10,6 +10,8 @@
  */
 class report_renderer {
 
+    const FILTERS_PER_ROW = 3;
+
     protected $report;
 
     /**
@@ -86,8 +88,17 @@ class report_renderer {
             $field .= '</select>';
             $fields[] = $field;
         }
+
+        // We want a new tr for the button so we add enough empty tds to have a full row.
+        $needsemptycells = count($fields) % self::FILTERS_PER_ROW;
+        if ($needsemptycells) {
+            for ($i = 0; $i < (self::FILTERS_PER_ROW - $needsemptycells); $i++) {
+                $fields[] = '';
+            }
+        }
+
         $fields[] = '<input type="submit" value="Filter runs"/>';
-        $output .= $this->create_table('Filter runs', $fields, 3);
+        $output .= $this->create_table('Filter runs', $fields, self::FILTERS_PER_ROW);
         $output .= '</form>';
 
         // Select runs form.

@@ -27,7 +27,8 @@ class test_plan_run {
         'rampup' => 'Ramp-up period',
         'size' => 'Size',
         'loopcount' => 'Number of loops',
-        'throughput' => 'Throughput'
+        'throughput' => 'Throughput',
+        'baseversion' => 'Base version'
     );
 
     /**
@@ -213,12 +214,17 @@ class test_plan_run {
 
         $runinfovars = array(
             'host', 'sitepath', 'group', 'rundesc', 'users', 'loopcount',
-            'rampup', 'throughput', 'size', 'siteversion', 'sitebranch', 'sitecommit'
+            'rampup', 'throughput', 'size', 'baseversion', 'siteversion', 'sitebranch', 'sitecommit'
         );
 
         // Object containing everything.
         $rundata = new stdClass();
         foreach ($runinfovars as $var) {
+
+            // In case runs don't have all vars defined.
+            if (empty($$var)) {
+                $$var = 'Unknown';
+            }
             $rundata->{$var} = $$var;
         }
         // Removing miliseconds.

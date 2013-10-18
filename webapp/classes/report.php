@@ -54,7 +54,7 @@ class report {
                 'orientation' => 'steporienteddataset',
                 'perrow' => 3,
                 'height' => 400,
-                'width' => 600,
+                'width' => 500,
             ),
             'grouped_steppedarea' => array(
                 'id' => 'grouped_steppedarea',
@@ -176,7 +176,14 @@ class report {
 
                     // Get the params for filtering.
                     foreach (test_plan_run::$runparams as $param => $name) {
-                        $value = $runfiles[$timestamp]->get_run_info()->{$param};
+
+                        // In case some runs misses vars.
+                        if (!empty($runfiles[$timestamp]->get_run_info()->{$param})) {
+                            $value = $runfiles[$timestamp]->get_run_info()->{$param};
+                        } else {
+                            $value = 'Unknown';
+                        }
+
                         if (empty($runsvalues[$param])) {
                             $runsvalues[$param] = array();
                         }
@@ -186,9 +193,15 @@ class report {
                     // Discard it if filters are set (once we got it's params).
                     if (!empty($_GET['filters'])) {
                         foreach ($_GET['filters'] as $param => $filteredvalue) {
+                            // In case some runs misses vars.
+                            if (!empty($runfiles[$timestamp]->get_run_info()->{$param})) {
+                                $runvar = $runfiles[$timestamp]->get_run_info()->{$param};
+                            } else {
+                                $runvar = 'Unknown';
+                            }
                             // Ensure it still exists.
                             if (!empty($filteredvalue) && !empty($runfiles[$timestamp]) &&
-                                    $filteredvalue != $runfiles[$timestamp]->get_run_info()->{$param}) {
+                                    $filteredvalue != $runvar) {
                                 unset($runfiles[$timestamp]);
                                 break;
                             }
