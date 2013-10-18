@@ -31,6 +31,11 @@ class report {
     protected $chartsdeclaration = array();
 
     /**
+     * @var array Errors found when comparing runs data.
+     */
+    protected $errors = array();
+
+    /**
      * Loads the test plans.
      *
      * @return void
@@ -94,6 +99,11 @@ class report {
             $run = new test_plan_run($timestamp);
             $run->parse_results();
             $this->runs[] = $run;
+        }
+
+        // Stop when runs are not comparables between them.
+        if (!$this->check_runs_are_comparable()) {
+            return false;
         }
 
         // Will be used to get runs generic data like the steps names, they are supposed to be
@@ -243,6 +253,44 @@ class report {
      */
     public function get_containers() {
         return $this->containers;
+    }
+
+    /**
+     * Returns wheter if errors have been found.
+     *
+     * @return array
+     */
+    public function get_errors() {
+        return $this->errors;
+    }
+
+    /**
+     * Returns true if the runs are comparable between them.
+     *
+     * @return bool True if they are comparable
+     */
+    protected function check_runs_are_comparable() {
+
+        $values = array();
+        foreach (test_plan_run::$runcomparablevars as $var) {
+            foreach ($this->runs as $run) {
+
+                $runvalue = $run->get_run_info()->$var;
+
+                // All should match the fist one.
+                if (empty($values[$var])) {
+                    $values[$var] = $runvalue;
+                }
+
+                if ($values[$var] != $runvalue) {
+                    $this->errors[$var] = "You can not compare runs with a different $var value";
+                }
+            }
+        }
+
+        if (!empty($this->errors)) {
+            return false;
+        }
     }
 
     /**

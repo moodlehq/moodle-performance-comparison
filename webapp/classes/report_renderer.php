@@ -179,6 +179,16 @@ class report_renderer {
 
         $output = '';
 
+        // Stop on errors.
+        if ($errors = $this->report->get_errors()) {
+            $output .= '<div class="errors">';
+            foreach ($errors as $error) {
+                $output .= '<div>' . $error . '</div>' . PHP_EOL;
+            }
+            $output .= '</div>';
+            return $output;
+        }
+
         // Number of columns per row.
         $containers = $this->report->get_containers();
         foreach ($this->report->get_charts_declaration() as $chartsdeclaration) {
