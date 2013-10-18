@@ -36,8 +36,8 @@ repository="git://github.com/moodle/moodle.git"
 # pointing to a minor or major release hash.
 #
 # You don't need to change this value
-# This is Moodle 2.5.2+ version 2013051402.05
-basecommit="22084d5ea299f87a5db8cd759488f1584e2c0f97"
+# This is Moodle 2.5.2+ version 2013051402.08
+basecommit="1115bb378056e11d632178124fe34f257d933afa"
 # Older bases in the branch will be listed here.
 # Example:
 # This is Moodle 2.5.x version NNNNNNNNN.00
