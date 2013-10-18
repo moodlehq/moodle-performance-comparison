@@ -32,6 +32,11 @@ class test_plan_run {
     );
 
     /**
+     * @var array Vars that needs to be equals across runs to be comparable.
+     */
+    public static $runcomparablevars = array('users', 'rampup', 'size', 'loopcount', 'throughput', 'baseversion');
+
+    /**
      * @var stdClass Run data, including the threads results.
      */
     protected $rundata;
