@@ -193,8 +193,9 @@ This tool in only intended to be used in development/testing environments inside
 
 
 ## Troubleshooting
+* You might be interested in raising the PHP memory_limit to 512MB (apache) or something like that to 'M' or bigger when comparing results.
 * You can find JMeter logs in logs/
 * You can find runs outputs in runs_outputs/ the results in runs_samples/ and the php arrays generated from them in runs/
 * The generated .jtl files can be big. Don't hesitate to get rid of them if you don't need them for extra analytic purposes.
-* Same with $backupsdir/ contents, if you run before_run_setup.sh many time you will have a looot of hd space wasted
+* Same with $backupsdir/ contents, if you run before_run_setup.sh many time you will have a looot of hd space wasted.
 * If files with _java_pid[\d]+.hprof_ format are generated in your project root means that jmeter is running out of resource. http://wiki.apache.org/jmeter/JMeterFAQ#JMeter_keeps_getting_.22Out_of_Memory.22_errors.__What_can_I_do.3F for more info.

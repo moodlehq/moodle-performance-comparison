@@ -145,6 +145,7 @@ if (!f.exists()) {
     out.write("$rampup = '"+vars.get("rampup")+"';\n");
     out.write("$throughput = '"+vars.get("throughput")+"';\n");
     out.write("$size = '"+vars.get("size")+"';\n");
+    out.write("$baseversion = '"+vars.get("moodleversion")+"';\n");
     out.write("$siteversion = '"+EscapeQuotes(props.get("siteversion"))+"';\n");
     out.write("$sitebranch = '"+EscapeQuotes(props.get("sitebranch"))+"';\n");
     out.write("$sitecommit = '"+EscapeQuotes(props.get("sitecommit"))+"';\n");
