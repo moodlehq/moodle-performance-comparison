@@ -291,6 +291,8 @@ class report {
         if (!empty($this->errors)) {
             return false;
         }
+
+        return true;
     }
 
     /**
