@@ -62,19 +62,28 @@ backupsdir="/your/directory/with/a/lot/of/free/space"
 # Services names to restart before each run. 
 # Note that this will only work in a limited set of systems as it uses system calls like "service $servicename restart"
 # You will need to restart the involved services manually.
-servicesarray=( apache2 mysql postgresql )
+#
+# Default value set in defaults.properties
+#
+#servicesarray=( apache2 mysql postgresql )
 
 # Path or alias of the browser you want to open the results with.
 # This setting is only useful when running compare.sh script.
-browser="firefox"
+#
+# Default value set in defaults.properties
+#
+#browser="firefox"
 
 # Allows you to overwrite the default commands.
 # Useful if you have multiple instances, if your
 # commands are not in $PATH...
-export phpcmd='php'
-export mysqlcmd='mysql'
-export pgsqlcmd='psql'
-export mysqldumpcmd='mysqldump'
-export pgsqldumpcmd='pg_dump'
-export gitcmd='git'
-export curlcmd='curl'
+#
+# Default values set in defaults.properties
+#
+#export phpcmd='php'
+#export mysqlcmd='mysql'
+#export pgsqlcmd='psql'
+#export mysqldumpcmd='mysqldump'
+#export pgsqldumpcmd='pg_dump'
+#export gitcmd='git'
+#export curlcmd='curl'
