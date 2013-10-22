@@ -1,5 +1,60 @@
 #!/bin/bash
 
+# Checks that the provided cmd commands are properly set.
+check_cmds()
+{
+    genericstr=" has a valid value or overwrite the default one using webserver_config.properties"
+
+    ${phpcmd} -v > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $phpcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${mysqlcmd} -V > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $mysqlcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${pgsqlcmd} --version > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $pgsqlcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${mysqldumpcmd} -V > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $mysqldumpcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${pgsqldumpcmd} --version > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $pgsqldumpcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${gitcmd} version > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $gitcmd'$genericstr
+        exit $errorcode
+    fi
+
+    ${curlcmd} -V > /dev/null
+    errorcode=$?
+    if [ "$errorcode" != 0 ]; then
+        echo 'Error: Ensure $curlcmd'$genericstr
+        exit $errorcode
+    fi
+}
+
 # Loads configuration and static vars. Should be a first include before moving to other directories.
 # For non-config files the caller script should check that the file exists to provide a more acurate error message.
 load_properties()
@@ -95,7 +150,7 @@ save_moodle_site_data()
     # Getting the current site data.
     siteversion="$(cat version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
     sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+')"
-    sitecommit="$(git show --oneline | head -n 1)"
+    sitecommit="$(${gitcmd} show --oneline | head -n 1)"
 
     sitedatacontents="siteversion=\"$siteversion\"
 sitebranch=\"$sitebranch\"

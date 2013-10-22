@@ -12,6 +12,7 @@
 . ./lib/lib.sh
 
 # Get config.
+load_properties "defaults.properties"
 load_properties "webserver_config.properties"
 
 rm runs/*.php -rf

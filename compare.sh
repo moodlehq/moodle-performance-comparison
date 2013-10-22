@@ -17,7 +17,11 @@
 . ./lib/lib.sh
 
 # Get user info.
+load_properties "defaults.properties"
 load_properties "webserver_config.properties"
+
+# Checks the $cmds.
+check_cmds
 
 timestart=`date +%s`
 
