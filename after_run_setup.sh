@@ -14,6 +14,7 @@
 #
 ##############################################
 
+# Exit on errors.
 #set -e
 
 # Dependencies.
@@ -67,6 +68,12 @@ if [ ! -d "$dataroot" ] || [ -z "$dataroot" ]; then
 fi
 rm $dataroot -rf
 cp -r $datarootbackup $dataroot
+cpexitcode=$?
+if [ "$cpexitcode" -ne "0" ]; then
+    echo "Error: code $cpexitcode. $datarootbackup can not be copied to $dataroot"
+    exit $cpexitcode
+fi
+
 chmod 777 $dataroot -R
 
 # Drop and restore the database.
@@ -74,13 +81,24 @@ if [ "$dbtype" == "pgsql" ]; then
     echo "#######################################################################"
     echo "Restoring database and dataroot to Moodle ($basecommit)"
     export PGPASSWORD=${dbpass}
-    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" --quiet
+
+    # Checking that the table exists.
+    databaseexists="$( ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -l | grep "$dbname" | wc -l )"
+    if [ "$databaseexists" != "0" ]; then
+        ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" --quiet
+    fi
     ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
     ${pgsqlcmd} --quiet -h "$dbhost" -U "$dbuser" $dbname < $databasebackup > /dev/null
+
 elif [ "$dbtype" == "mysqli" ]; then
     echo "#######################################################################"
     echo "Restoring database and dataroot to Moodle ($basecommit)"
-    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+
+    # Checking that the table exists.
+    databaseexists="$( ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "SHOW DATABASES LIKE '$dbname'" )"
+    if [ ! -z "$databaseexists" ];then
+        ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+    fi
     ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" --silent
     ${mysqlcmd} --silent --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup > /dev/null
 else

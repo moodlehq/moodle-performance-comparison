@@ -14,7 +14,8 @@
 #
 ##############################################
 
-set -e
+# Exit on errors.
+#set -e
 
 # Dependencies.
 . ./lib/lib.sh

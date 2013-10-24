@@ -13,6 +13,7 @@
 #
 ##############################################
 
+# Exit on errors.
 #set -e
 
 # Dependencies.
@@ -97,11 +98,25 @@ fi
 # Creating new database and delete it if it already exists.
 if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
-    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" 2> /dev/null --quiet
+
+    # Checking that the table exists.
+    databaseexists="$( ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -l | grep "$dbname" | wc -l )"
+    if [ "$databaseexists" != "0" ]; then
+        ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" --quiet
+    fi
+
     ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
+
 elif [ "$dbtype" == "mysqli" ]; then
-    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+
+    # Checking that the table exists.
+    databaseexists="$( ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "SHOW DATABASES LIKE '$dbname'" )"
+    if [ ! -z "$databaseexists" ];then
+        ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+    fi
+
     ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" --silent
+
 else
     confirmoutput="Only postgres and mysql support: You need to manually create your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -148,7 +163,7 @@ echo "Installing Moodle ($basecommit)"
 ${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" > /dev/null
 installexitcode=$?
 if [ "$installexitcode" -ne "0" ]; then
-    echo "Error: Moodle can not be installed"
+    echo "Error: Moodle can not be installed, check that the database data is correctly set"
     exit $installexitcode
 fi
 
@@ -156,7 +171,7 @@ fi
 ${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" --quiet > /dev/null
 testsiteexitcode=$?
 if [ "$testsiteexitcode" -ne "0" ]; then
-    echo "Error: The test site can not be generated"
+    echo "Error: The test site can not be generated, check that the site is correctly installed"
     exit $testsiteexitcode
 fi
 
@@ -164,13 +179,19 @@ fi
 ${phpcmd} ../set_moodle_site.php
 setsiteexitcode=$?
 if [ "$setsiteexitcode" -ne "0" ]; then
-    echo "Error: The test site can not be configured"
+    echo "Error: The test site can not be configured, check that the site is correctly installed"
     exit $setsiteexitcode
 fi
 
 # We capture the output to get the files we will need.
 testplancommand=${phpcmd}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck' > /dev/null
 testplanfiles="$(${testplancommand})"
+testplanfileexitcode=$?
+if [ "$testplanfileexitcode" -ne "0" ]; then
+    echo "Error: code $testplanfileexitcode. Moodle's test plan generator could not finish as expected"
+    exit $testplanfileexitcode
+fi
+
 # We only get the first two items as there is more performance info.
 if [[ "$testplanfiles" == *"testplan"* ]]; then
     # Prepare curl arguments.
@@ -203,6 +224,12 @@ filenamedatabase="$backupsdir/database_backup_$datesufix.sql"
 echo "Creating Moodle ($basecommit) database and dataroot backups"
 rm -rf $dataroot/sessions
 cp -r $dataroot $filenamedataroot
+cpexitcode=$?
+if [ "$cpexitcode" -ne "0" ]; then
+    echo "Error: code $cpexitcode. $dataroot can not be copied to $filenamedataroot"
+    exit $cpexitcode
+fi
+
 
 # Database backup.
 if [ "$dbtype" == "pgsql" ]; then
@@ -222,6 +249,12 @@ testusersfile=$filenameusers
 datarootbackup=$filenamedataroot
 databasebackup=$filenamedatabase"
 echo "$generatedfiles" > "$currentwd/test_files.properties"
+fileexitcode=$?
+if [ "$fileexitcode" -ne "0" ]; then
+    echo "Error: code $fileexitcode. Moodle can not add the info about the generated files to $currentwd/test_files.properties check the permissions"
+    exit $fileexitcode
+fi
+
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
 echo "Upgrading Moodle ($basecommit) to $beforebranch"

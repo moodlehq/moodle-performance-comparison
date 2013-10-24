@@ -12,6 +12,9 @@
 #
 ##############################################
 
+# Exit on errors.
+#set -e
+
 # Dependencies.
 . ./lib/lib.sh
 
@@ -29,3 +32,12 @@ save_moodle_site_data
 
 # Returning home in case this script is called by others.
 cd ..
+
+outputinfo="
+#######################################################################
+Site info file created successfully
+
+"
+
+echo "$outputinfo"
+exit 0
