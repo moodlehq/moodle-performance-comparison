@@ -60,7 +60,11 @@ Arguments:
 esac
 
 # Get user info.
+load_properties "defaults.properties"
 load_properties "webserver_config.properties"
+
+# Checks the $cmds.
+check_cmds
 
 # Creating & cleaning dirroot & dataroot (keeping .git)
 if [ ! -e "$dataroot" ]; then

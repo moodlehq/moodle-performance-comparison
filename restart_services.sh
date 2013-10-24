@@ -20,7 +20,11 @@ set -e
 . ./lib/lib.sh
 
 # Load webserver-side config.
+load_properties "defaults.properties"
 load_properties "webserver_config.properties"
+
+# Checks the $cmds.
+check_cmds
 
 # Only root access; prevents ugly service command error messages.
 if [ "$(id -u)" != "0" ]; then
