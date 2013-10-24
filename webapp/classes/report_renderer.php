@@ -35,6 +35,7 @@ class report_renderer {
         echo $this->output_form();
         echo $this->output_runs_info();
         echo $this->output_charts_containers();
+        echo $this->output_differences();
 
         // Link to Sam's tool with detailed data (just the first 2 runs).
         if (!empty($_GET['timestamps']) && count($_GET['timestamps']) >= 2) {
@@ -181,9 +182,9 @@ class report_renderer {
 
         // Stop on errors.
         if ($errors = $this->report->get_errors()) {
-            $output .= '<div class="errors">';
+            $output .= '<div class="centeredcontainer">';
             foreach ($errors as $error) {
-                $output .= '<div>' . $error . '</div>' . PHP_EOL;
+                $output .= '<div class="error">' . $error . '</div>' . PHP_EOL;
             }
             $output .= '</div>';
             return $output;
@@ -196,6 +197,36 @@ class report_renderer {
         }
 
         return $output;
+    }
+
+    /**
+     * Outputs all the major differences between runs.
+     *
+     * @return string HTML
+     */
+    protected function output_differences() {
+
+        if (!$branches = $this->report->get_big_differences()) {
+            return '';
+        }
+
+        $lines = array();
+        foreach ($branches as $branchnames => $changes) {
+
+            // Output which branches differs.
+            $lines[] = '<b>' . $branchnames . '</b>';
+            $lines[] = '';
+
+            foreach ($changes as $state => $data) {
+                foreach ($data as $var => $step) {
+                    foreach ($step as $stepname => $msg) {
+                        $lines[] = '<div class="' . $state . '">' . $var . ': ' . $state . ' - ' . $stepname . ', ' . $msg . '</div><br/>';
+                    }
+                }
+            }
+        }
+
+        return $this->create_table('Performance changes between runs', $lines, 1);
     }
 
     /**
