@@ -48,7 +48,11 @@ if [ ! -d "moodle/.git" ]; then
 fi
 
 # Get user info.
+load_properties "defaults.properties"
 load_properties "webserver_config.properties"
+
+# Checks the $cmds.
+check_cmds
 
 # Get generated test plan values.
 load_properties "test_files.properties"
