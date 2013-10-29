@@ -1,6 +1,6 @@
 ###############################################
 # Configure with your own values.
-# 
+#
 # Remember to run ./before_run_setup.sh after changing
 # any of those values as everything would change and
 # previous runs would neither be valid.
@@ -53,13 +53,40 @@ beforebranch="master"
 afterbranch="master"
 
 
+## Comparison thresholds #######################
+
+# You can use these vars to specify what difference between runs
+# can be considered an increase or a decrease and what can
+# be ignored. The number represents a percentage between the first
+# run and the other/s one/s.
+#
+# This var value will mark the accepted difference between the
+# different vars of a run when comparing each of the test plan
+# steps. Default value as defined in defaults.properties:
+#
+# groupedthreshold=4
+#
+# This var value will mark the accepted difference between the
+# different vars of a run when comparing the sum of all test
+# plan steps. Default value as defined in defaults.properties:
+#
+# singlestepthreshold=2
+#
+# You can also specify a JSON associative array with the detailed list of thresholds which will
+# have preference over $groupedthreshold and $singlestepthreshold. The JSON string should be defined
+# all in one line, wrapped using single quotes, and following this format:
+#
+# thresholds='{"bystep":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5},"total":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5}}'
+#
+
+
 ## Others ####################################################
 
 # The database and dataroot backups will be stored here.
 # Note that this can grow a lot depending on the test sizes you use.
 backupsdir="/your/directory/with/a/lot/of/free/space"
 
-# Services names to restart before each run. 
+# Services names to restart before each run.
 # Note that this will only work in a limited set of systems as it uses system calls like "service $servicename restart"
 # You will need to restart the involved services manually.
 #

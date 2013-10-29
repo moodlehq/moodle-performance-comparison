@@ -16,11 +16,22 @@ h2 {
     margin-top: 30px;
 }
 
-.errors {
+.centeredcontainer {
     border-style: solid;
-    margin: 50px auto;
+    margin: 50px 200px;
+    padding: 5px;
     text-align: center;
+}
+
+.decrease {
+    color: green;
+}
+
+.error {
     font-size: 20px;
+}
+
+.error, .increment {
     color: red;
 }
 
