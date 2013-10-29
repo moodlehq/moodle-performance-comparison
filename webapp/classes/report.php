@@ -11,6 +11,11 @@
 class report {
 
     /**
+     * @var Until where we can skip a false positive if it goes from or to 0.
+     */
+    const FALSE_POSITIVE_SCALAR_THRESHOLD = 2;
+
+    /**
      * @var The path relative to the project root.
      */
     const RUNS_RELATIVE_PATH = 'runs/';
@@ -34,6 +39,11 @@ class report {
      * @var array Errors found when comparing runs data.
      */
     protected $errors = array();
+
+    /**
+     * @var array Big differences between the first run and the other ones.
+     */
+    protected $bigdifferences = array();
 
     /**
      * Loads the test plans.
@@ -80,19 +90,19 @@ class report {
     }
 
     /**
-     * Generates the report
+     * Gets the runs data
      *
      * @param array $timestamps We will get the runs files from their timestamp (is part of the name).
-     * @return void
+     * @return bool Whether runs are comparable or not.
      */
-    public function make(array $timestamps) {
+    public function parse_runs(array $timestamps) {
 
         krsort($timestamps);
 
         foreach ($timestamps as $timestamp) {
 
             if (!is_numeric($timestamp)) {
-                die('Timestamps are supposed to be [0-9], cheater!');
+                die('Error: Timestamps are supposed to be [0-9]' . PHP_EOL);
             }
 
             // Creating the run object and parsing it.
@@ -103,6 +113,23 @@ class report {
 
         // Stop when runs are not comparables between them.
         if (!$this->check_runs_are_comparable()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Generates the report
+     *
+     * @param array $timestamps We will get the runs files from their timestamp (is part of the name).
+     * @return bool False if problems were found.
+     */
+    public function make(array $timestamps) {
+
+        // Gets the runs data and checks that it is comparable.
+        if (!$this->parse_runs($timestamps)) {
+            // No need to parse anything if it is not comparable.
             return false;
         }
 
@@ -165,6 +192,11 @@ class report {
 
             $this->create_charts($var, $steporienteddataset, $runorienteddataset);
         }
+
+        // We calculate differences between runs to list them.
+        $this->calculate_big_differences();
+
+        return true;
     }
 
     /**
@@ -226,6 +258,202 @@ class report {
         krsort($runfiles);
 
         return array($runfiles, $runsvalues);
+    }
+
+    /**
+     * Gets the big changes comparing the first run against the other runs results
+     *
+     * @param array $thresholds Format: array('bystep' => array('dbreads' => 1, 'dbwrites' => ...), 'total' => array('dbreads' => 2, 'dbwrites'...))
+     * @return bool Whether it finished ok.
+     */
+    public function calculate_big_differences(array $thresholds = array()) {
+
+        // Default values if nothing was provided.
+        if (empty($thresholds)) {
+            if (!$thresholds = $this->get_default_thresholds()) {
+                return false;
+            }
+        }
+
+        // We get the first run as a base to compare with the other runs
+        $baserun = & $this->runs[0];
+        $basetocompare = $baserun->get_run_dataset(false, 'totalsums');
+
+        // Comparing each other run against the base one.
+        $nruns = count($this->runs);
+        // We skip the first one.
+        for ($i = 1; $i < $nruns; $i++) {
+
+            $run = & $this->runs[$i];
+
+            $varaggregates = array_fill_keys(test_plan_run::$runvars, 0);
+
+            $runtotals = $run->get_run_dataset(false, 'totalsums');
+            foreach ($runtotals as $var => $steps) {
+
+                $branchnames = 'between ' . $baserun->get_run_info_string() . ' and ' . $run->get_run_info_string();
+
+                // Check differences between specific steps.
+                foreach ($steps as $stepname => $value) {
+
+                    if ($changed = $this->get_value_changes($basetocompare[$var][$stepname], $value, $thresholds['bystep'][$var])) {
+                        list($state, $msg) = $changed;
+                        $this->bigdifferences[$branchnames][$state][$var][$stepname] = $msg;
+                    }
+
+                    // Add it to the global $var sum
+                    $varaggregates[$var] = $varaggregates[$var] + $value;
+                }
+
+                // Has the performance changed in general.
+                if ($changed = $this->get_value_changes(array_sum($basetocompare[$var]), $varaggregates[$var], $thresholds['total'][$var])) {
+
+                    list($state, $msg) = $changed;
+
+                    // We unset all the steps to avoid showing too much info with a general increase / decrease is ok.
+                    $this->bigdifferences[$branchnames][$state][$var] = array();
+                    $this->bigdifferences[$branchnames][$state][$var]['All steps data combined'] = $msg;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets the big differences between runs.
+     *
+     * @return array|bool List of big differences between runs. False if there are no runs.
+     */
+    public function get_big_differences() {
+        return $this->bigdifferences;
+    }
+
+    /**
+     * Hopefully your eyes will not burn after reading this function's code.
+     *
+     * Uses the .properties files looking for the threshold values. Gives preference to
+     * $thresholds array over $groupedthreshold and $singlestepthreshold.
+     *
+     * @return array Format: array('bystep' => array('dbreads' => 1, 'dbwrites' => ...), 'total' => array('dbreads' => 2, 'dbwrites'...))
+     */
+    protected function get_default_thresholds() {
+
+        $vars = array('groupedthreshold', 'singlestepthreshold', 'thresholds');
+
+        // Ordered by preference.
+        $files = array(
+            __DIR__ . '/../../webserver_config.properties',
+            __DIR__ . '/../../defaults.properties'
+        );
+
+        foreach ($files as $file) {
+
+            // Open the file and read each line.
+            if ($fh = fopen($file, 'r')) {
+                while (($line = fgets($fh)) !== false) {
+
+                    foreach ($vars as $var) {
+                        $return = $this->extract_threshold_value($var, $line);
+                        if ($return && empty($$var)) {
+                            $$var = $return;
+                        }
+                    }
+                }
+            }
+        }
+
+        // There will always be a value in defaults.properties.
+        if (empty($groupedthreshold) || empty($singlestepthreshold)) {
+            die('Error: defaults.properties thresholds values can not be found' . PHP_EOL);
+        }
+
+        // Preference to $thresholds.
+        if (!empty($thresholds)) {
+            return json_decode($thresholds, true);
+        }
+
+        // Generate the default thresholds array.
+        $thresholds = array('bystep' => array(), 'total' => array());
+        foreach (test_plan_run::$runvars as $var) {
+            $thresholds['bystep'][$var] = $singlestepthreshold;
+            $thresholds['total'][$var] = $groupedthreshold;
+
+        }
+
+        return $thresholds;
+    }
+
+    /**
+     * Extracts the property value from $line
+     *
+     * @param string $var
+     * @param string $line
+     * @return string The var value
+     */
+    protected function extract_threshold_value($var, $line) {
+
+        // It can be commented.
+        if (strpos($line, $var . '=') !== 0) {
+            return false;
+        }
+
+        // Just in case an extra conditional as is the user the one that enters the value
+        if (preg_match("/$var='?([^']*)'?/", $line, $matches)) {
+            return $matches[1];
+        }
+
+        return false;
+    }
+
+    /**
+     * Describes the changes between two values using the provided threshold
+     *
+     * @param float $from
+     * @param float $to
+     * @param float $threshold
+     * @return bool|string The string describing the changes or false if there are no changes
+     */
+    protected function get_value_changes($from, $to, $threshold) {
+
+        // Different treatment for near-zero values.
+        // If there are real problems the sum of all the steps will spot them.
+        if ($to == 0 && $from == 0) {
+            // Skip it.
+            return false;
+        } else if ($to == 0) {
+            if ($from > self::FALSE_POSITIVE_SCALAR_THRESHOLD) {
+                // It is a real decrease if goes to 0.
+                return array('decrease', 'from ' . $from . ' to 0');
+            } else {
+                // Ignore the change.
+                return false;
+            }
+        } else if ($from == 0) {
+            if ($to > self::FALSE_POSITIVE_SCALAR_THRESHOLD) {
+                // It is a increment if it was 0 and now is too much.
+                return array('increment', 'from 0 to ' . $to);
+            } else {
+                // Ignore the change.
+                return false;
+            }
+        }
+
+        $difference = ($to * 100) / $from;
+
+        if ($difference > 100) {
+            $change = round($difference - 100, 2);
+        } else {
+            $change = round(100 - $difference, 2);
+        }
+
+        if (($difference - $threshold) > 100) {
+            return array('increment', $change . '% worst');
+        } else if (($difference + $threshold) < 100) {
+            return array('decrease', $change . '% better');
+        }
+
+        return false;
     }
 
     /**
@@ -319,7 +547,7 @@ class report {
 
         $chartid = $var . '_' . $chartdeclaration['id'];
 
-        // TODO: Merge with the declared ones.
+        // TODO: Merge with the declared ones to allow specific behaviours.
         $options = array('title' => $var);
 
         $chart = new google_chart($chartid, $dataset, $chartdeclaration['class'], $options);

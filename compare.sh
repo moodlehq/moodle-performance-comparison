@@ -11,6 +11,7 @@
 #
 ##############################################
 
+# Exit on errors.
 #set -e
 
 # Dependencies.
@@ -31,13 +32,17 @@ groupname="compare_"`date '+%Y%m%d%H%M'`
 
 # Hardcoding S as the size, with 5 loops is enough to have consistent results.
 ./before_run_setup.sh S
-if [ "$?" -ne "0" ]; then
-    exit 1
+beforeexitcode=$?
+if [ "$beforeexitcode" -ne "0" ]; then
+    echo "Error: Before run setup didn't finish as expected"
+    exit $beforeexitcode
 fi
 
-./test_runner.sh "$groupname" "before" -l 5
-if [ "$?" -ne "0" ]; then
-    exit 1
+./test_runner.sh "$groupname" "before"
+beforerunexitcode=$?
+if [ "$beforerunexitcode" -ne "0" ]; then
+    echo "Error: The before test run didn't finish as expected"
+    exit $beforerunexitcode
 fi
 
 # We don't restart the browser here, this is a development machine
@@ -45,13 +50,17 @@ fi
 # finish.
 
 ./after_run_setup.sh
-if [ "$?" -ne "0" ]; then
-    exit 1
+afterexitcode=$?
+if [ "$afterexitcode" -ne "0" ]; then
+    echo "Error: After run setup didn't finish as expected"
+    exit $afterexitcode
 fi
 
-./test_runner.sh "$groupname" "after" -l 5
-if [ "$?" -ne "0" ]; then
-    exit 1
+./test_runner.sh "$groupname" "after"
+afterrunexitcode=$?
+if [ "$afterrunexitcode" -ne "0" ]; then
+    echo "Error: The after test run didn't finish as expected"
+    exit $afterrunexitcode
 fi
 
 timeend=`date +%s`

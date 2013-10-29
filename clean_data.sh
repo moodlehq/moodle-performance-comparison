@@ -8,6 +8,9 @@
 #
 ##############################################
 
+# Exit on errors.
+#set -e
+
 # Dependencies.
 . ./lib/lib.sh
 
@@ -25,6 +28,15 @@ sudo rm cache -rf
 
 # Also backups.
 sudo rm $backupsdir/* -rf
+
+# Delete compare files.
+if [ -f "moodle/site_data.properties" ]; then
+    rm moodle/site_data.properties -f
+fi
+
+if [ -f "test_files.properties" ]; then
+    rm test_files.properties -f
+fi
 
 outputinfo="
 #######################################################################

@@ -80,8 +80,8 @@ checkout_branch()
 
     # rm + add as it can change.
     # Only if it exists.
-    ${gitcmd} ls-remote $2 --quiet
-    if [ "$?" == "0" ]; then
+    remotes="$( ${gitcmd} remote show )"
+    if [ "$remotes" == *$2* ] || [ "$remotes" == "$2" ]; then
         ${gitcmd} remote rm $2
     fi
     ${gitcmd} remote add $2 $1
@@ -89,40 +89,15 @@ checkout_branch()
     ${gitcmd} fetch $2 --quiet
 
     # Checking if it is a branch or a hash.
-    ${gitcmd} show-ref --verify --quiet refs/remotes/$2/$3
-    if [ $? == "0" ]; then
+    isareference="$( ${gitcmd} show-ref | grep "refs/remotes/$2/$3" | wc -l )"
+    if [ "$isareference" == "1" ]; then
 
         # Checkout the last version of the branch.
-        ${gitcmd} show-ref --verify --quiet refs/heads/$3
-        if [ $? == "0" ]; then
-            # Delete to avoid conflicts if there are git history changes.
-            ${gitcmd} checkout master --quiet
-            if [ "$3" == "master" ]; then
-                # Master history is constant.
-                ${gitcmd} rebase $2/master --quiet 2> /dev/null
-
-                # In case there was a repository change master can be completely different.
-                if [ $? != "0" ]; then
-                    ${gitcmd} rebase --abort
-                    ${gitcmd} checkout $2/master --quiet
-                    ${gitcmd} branch -D master --quiet
-                    ${gitcmd} checkout master --quiet
-                fi
-            else
-                ${gitcmd} branch -D $3 --quiet
-                ${gitcmd} checkout -b $3 $2/$3 --quiet
-            fi
-        else
-            ${gitcmd} checkout -b $3 $2/$3 --quiet
-        fi
-
+        # Reset to avoid conflicts if there are git history changes.
+        ${gitcmd} checkout -B $3 $2/$3 --quiet
     else
-        # Just checkout the hash.
+        # Just checkout the hash and let if fail if it is incorrect.
         ${gitcmd} checkout $3 --quiet
-        if [ $? != "0" ]; then
-            echo "Error: The provided branch/hash can not be found."
-            exit 1
-        fi
     fi
 
 }
@@ -130,9 +105,9 @@ checkout_branch()
 # Shows the time elapsed in hours, mins and secs.
 show_elapsed_time()
 {
-    ((h=${1}/3600))
-    ((m=(${1}%3600)/60))
-    ((s=${1}%60))
+    h=$((${1}/3600))
+    m=$(((${1}%3600)/60))
+    s=$((${1}%60))
     printf "Elapsed time: %02d:%02d:%02d\n" $h $m $s
 }
 
