@@ -12,32 +12,38 @@ check_cmds()
         exit $errorcode
     fi
 
-    ${mysqlcmd} -V > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $mysqlcmd'$genericstr
-        exit $errorcode
+    # Only if mysql is being used.
+    if [ "$dbtype" == "mysqli" ]; then
+        ${mysqlcmd} -V > /dev/null
+        errorcode=$?
+        if [ "$errorcode" != 0 ]; then
+            echo 'Error: Ensure $mysqlcmd'$genericstr
+            exit $errorcode
+        fi
+
+        ${mysqldumpcmd} -V > /dev/null
+        errorcode=$?
+        if [ "$errorcode" != 0 ]; then
+            echo 'Error: Ensure $mysqldumpcmd'$genericstr
+            exit $errorcode
+        fi
     fi
 
-    ${pgsqlcmd} --version > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $pgsqlcmd'$genericstr
-        exit $errorcode
-    fi
+    # Only if pgsql is being used.
+    if [ "$dbtype" == "pgsql" ]; then
+        ${pgsqlcmd} --version > /dev/null
+        errorcode=$?
+        if [ "$errorcode" != 0 ]; then
+            echo 'Error: Ensure $pgsqlcmd'$genericstr
+            exit $errorcode
+        fi
 
-    ${mysqldumpcmd} -V > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $mysqldumpcmd'$genericstr
-        exit $errorcode
-    fi
-
-    ${pgsqldumpcmd} --version > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $pgsqldumpcmd'$genericstr
-        exit $errorcode
+        ${pgsqldumpcmd} --version > /dev/null
+        errorcode=$?
+        if [ "$errorcode" != 0 ]; then
+            echo 'Error: Ensure $pgsqldumpcmd'$genericstr
+            exit $errorcode
+        fi
     fi
 
     ${gitcmd} version > /dev/null

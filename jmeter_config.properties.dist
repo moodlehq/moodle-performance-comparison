@@ -6,3 +6,30 @@
 
 # Jmeter directory (/bin/jmeter will be added by test_runner.sh).
 jmeter_path=/opt/apache-jmeter-2.9
+
+
+## Comparison thresholds #######################
+
+# You can use these vars to specify what difference between runs
+# can be considered an increase or a decrease and what can
+# be ignored. The number represents a percentage between the first
+# run and the other/s one/s.
+#
+# This var value will mark the accepted difference between the
+# different vars of a run when comparing each of the test plan
+# steps. Default value as defined in defaults.properties:
+#
+# groupedthreshold=4
+#
+# This var value will mark the accepted difference between the
+# different vars of a run when comparing the sum of all test
+# plan steps. Default value as defined in defaults.properties:
+#
+# singlestepthreshold=2
+#
+# You can also specify a JSON associative array with the detailed list of thresholds which will
+# have preference over $groupedthreshold and $singlestepthreshold. The JSON string should be defined
+# all in one line, wrapped using single quotes, and following this format:
+#
+# thresholds='{"bystep":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5},"total":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5}}'
+#

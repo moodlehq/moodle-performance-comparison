@@ -343,7 +343,7 @@ class report {
 
         // Ordered by preference.
         $files = array(
-            __DIR__ . '/../../webserver_config.properties',
+            __DIR__ . '/../../jmeter_config.properties',
             __DIR__ . '/../../defaults.properties'
         );
 
