@@ -258,7 +258,7 @@ fi
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
 echo "Upgrading Moodle ($basecommit) to $beforebranch"
-checkout_branch $repository 'origin' $beforebranch
+checkout_branch $beforebranchrepository 'before' $beforebranch
 ${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null
 upgradeexitcode=$?
 if [ "$upgradeexitcode" -ne "0" ]; then
