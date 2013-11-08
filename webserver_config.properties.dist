@@ -45,7 +45,7 @@ basecommit="1115bb378056e11d632178124fe34f257d933afa"
 
 # The original branch.
 # Usually one of Moodle's weekly released branches. You can also use a git hash here.
-afterbranchrepository="git://github.com/moodle/moodle.git"
+beforebranchrepository="git://github.com/moodle/moodle.git"
 beforebranch="MOODLE_25_STABLE"
 
 # The branch to compare against.
