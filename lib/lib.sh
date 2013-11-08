@@ -152,8 +152,8 @@ save_moodle_site_data()
     fi
 
     # Getting the current site data.
-    siteversion="$(cat version.php | grep '$version' | grep -o '[0-9].[0-9]\+')"
-    sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+')"
+    siteversion="$(cat version.php | grep '$version' | grep -o '[0-9]\+.[0-9]\+' | head -n 1)"
+    sitebranch="$(cat version.php | grep '$branch' | grep -o '[0-9]\+' | head -n 1)"
     sitecommit="$(${gitcmd} show --oneline | head -n 1)"
 
     sitedatacontents="siteversion=\"$siteversion\"
