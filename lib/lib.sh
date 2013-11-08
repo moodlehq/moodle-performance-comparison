@@ -84,13 +84,24 @@ checkout_branch()
         ${gitcmd} init --quiet
     fi
 
-    # rm + add as it can change.
-    # Only if it exists.
+    # Add/update the remote if necessary.
     remotes="$( ${gitcmd} remote show )"
-    if [ "$remotes" == *$2* ] || [ "$remotes" == "$2" ]; then
-        ${gitcmd} remote rm $2
+    if [[ "$remotes" == *$2* ]] || [ "$remotes" == "$2" ]; then
+        # Remove the remote if it already exists and it is different.
+        remoteinfo="$( ${gitcmd} remote show "$2" -n | head -n 3 )"
+        if [[ ! "$remoteinfo" == *$1* ]]; then
+            ${gitcmd} remote rm $2
+            ${gitcmd} remote add $2 $1
+        fi
+    else
+        ${gitcmd} remote add $2 $1
     fi
-    ${gitcmd} remote add $2 $1
+    remoteexitcode=$?
+    if [ "$remoteexitcode" -ne "0" ]; then
+        echo "Error: The '$1' remote value you provided does not exist or it is not set. Check webserver_config.properties.dist"
+        exit $remoteexitcode
+    fi
+
 
     ${gitcmd} fetch $2 --quiet
 
@@ -101,9 +112,21 @@ checkout_branch()
         # Checkout the last version of the branch.
         # Reset to avoid conflicts if there are git history changes.
         ${gitcmd} checkout -B $3 $2/$3 --quiet
+        checkoutexitcode=$?
+        if [ "$checkoutexitcode" -ne "0" ]; then
+            echo "Error: The '$3' tag or branch you provided does not exist or it is not set. Check webserver_config.properties.dist"
+            exit $checkoutexitcode
+        fi
+
     else
         # Just checkout the hash and let if fail if it is incorrect.
         ${gitcmd} checkout $3 --quiet
+        checkoutexitcode=$?
+        if [ "$checkoutexitcode" -ne "0" ]; then
+            echo "Error: The '$3' hash you provided does not exist or it is not set. Check webserver_config.properties.dist"
+            exit $checkoutexitcode
+        fi
+
     fi
 
 }
