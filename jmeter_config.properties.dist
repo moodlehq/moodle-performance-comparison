@@ -8,7 +8,7 @@
 jmeter_path=/opt/apache-jmeter-2.9
 
 
-## Comparison thresholds #######################
+## Results #######################
 
 # You can use these vars to specify what difference between runs
 # can be considered an increase or a decrease and what can
@@ -33,3 +33,7 @@ jmeter_path=/opt/apache-jmeter-2.9
 #
 # thresholds='{"bystep":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5},"total":{"dbreads":2,"dbwrites":2,"memoryused":2,"filesincluded":1,"serverload":10,"sessionsize":2,"timeused":5}}'
 #
+# Include logs table writes as db writes, this is enabled by default.
+# Set includelogs="" in case you don't want to include them.
+#
+# includelogs=1

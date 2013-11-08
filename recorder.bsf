@@ -19,11 +19,21 @@ MoodleResult(JMeterContext ctx) {
         dbreads = mdbreads.group(1);
     }
 
-    String dbwrites = "0";
+    String dbwritesstr = "0";
     Pattern pdbwrites = Pattern.compile(".*?DB reads/writes: \\d+/(\\d+).*", Pattern.UNIX_LINES | Pattern.DOTALL);
     Matcher mdbwrites = pdbwrites.matcher(html);
     if (mdbwrites.matches()) {
-        dbwrites = mdbwrites.group(1);
+        dbwritesstr = mdbwrites.group(1);
+    }
+    Integer dbwrites = Integer.parseInt(dbwritesstr);
+
+    // Adding logs if required.
+    if (props.get("includelogs") != null) {
+        Pattern plogwrites = Pattern.compile(".*?Log DB writes (\\d+).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+        Matcher mlogwrites = plogwrites.matcher(html);
+        if (mlogwrites.matches()) {
+            dbwrites = dbwrites + Integer.parseInt(mlogwrites.group(1));
+        }
     }
 
     String memoryused = "0";
@@ -87,7 +97,7 @@ MoodleResult(JMeterContext ctx) {
         str += StringUtils.rightPad(username, 10) + " | ";
         str += StringUtils.rightPad(name, 30) + " | ";
         str += StringUtils.rightPad(dbreads, 4) + " | ";
-        str += StringUtils.rightPad(dbwrites, 4) + " | ";
+        str += StringUtils.rightPad(Integer.toString(dbwrites), 4) + " | ";
         str += StringUtils.rightPad(memoryused, 8) + " | ";
         str += StringUtils.rightPad(filesincluded, 6) + " | ";
         str += StringUtils.rightPad(serverload, 6) + " | ";
@@ -100,7 +110,7 @@ MoodleResult(JMeterContext ctx) {
        php += "    'thread'=>"+thread+",\n";        // Int
        php += "    'starttime'=>"+starttime+",\n";      // Long
        php += "    'dbreads'=>"+Integer.parseInt(dbreads)+",\n";    // String => Int
-       php += "    'dbwrites'=>"+Integer.parseInt(dbwrites)+",\n";  // String => Int
+       php += "    'dbwrites'=>"+dbwrites+",\n";
        php += "    'memoryused'=>'"+memoryused+"',\n";
        php += "    'filesincluded'=>'"+filesincluded+"',\n";
        php += "    'serverload'=>'"+serverload+"',\n";
