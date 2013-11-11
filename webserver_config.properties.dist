@@ -83,10 +83,17 @@ backupsdir="/your/directory/with/a/lot/of/free/space"
 #
 # Default values set in defaults.properties
 #
-#export phpcmd='php'
-#export mysqlcmd='mysql'
-#export pgsqlcmd='psql'
-#export mysqldumpcmd='mysqldump'
-#export pgsqldumpcmd='pg_dump'
-#export gitcmd='git'
-#export curlcmd='curl'
+#phpcmd='php'
+#mysqlcmd='mysql'
+#pgsqlcmd='psql'
+#mysqldumpcmd='mysqldump'
+#pgsqldumpcmd='pg_dump'
+#gitcmd='git'
+#curlcmd='curl'
+
+# Allows you to change the size used by compare.sh
+# Note that using a XS size may lead to unstable results
+# as there is moodle code that only runs only certain
+# timing conditions; this is balanced leading to stable
+# results using a S size or higher.
+#defaultcomparesize=S
