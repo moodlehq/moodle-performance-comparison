@@ -32,6 +32,7 @@ $CFG->cachetext = 0;
 // Moodle will try to define it again, the php error will be hidden with
 // debug mode disabled. https://tracker.moodle.org/browse/MDL-41910
 define('LASTACCESS_UPDATE_SECS', 9999999999);
+define('MDL_PERF_TEST', true);
 
 // Set the generated users password to avoid the default non-loggeable one.
 $CFG->tool_generator_users_password = '%%toolgeneratorpassword%%';
