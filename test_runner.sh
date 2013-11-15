@@ -142,12 +142,13 @@ runoutput="runs_outputs/$datestring.output"
 
 # Include logs string.
 includelogsstr="-Jincludelogs=$includelogs"
+samplerinitstr="-Jbeanshell.listener.init=recorderfunctions.bsf"
 
 # Run it baby! (without GUI).
 echo "#######################################################################"
 echo "Test running... (time for a coffee?)"
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $includelogsstr $users $loops $rampup $throughput > $runoutput
+$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $samplerinitstr $includelogsstr $users $loops $rampup $throughput > $runoutput
 jmeterexitcode=$?
 if [ "$jmeterexitcode" -ne "0" ]; then
     echo "Error: Jmeter can not run, ensure that:"

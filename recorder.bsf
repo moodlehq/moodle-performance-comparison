@@ -134,18 +134,18 @@ EscapeQuotes(String text) {
 
 Runnable mr = MoodleResult(ctx);
 
-// Create the file.
-String filenamepath = "runs/" + vars.get("runtimestamp") + ".php";
-File f = new File(filenamepath);
-if (!f.exists()) {
-    FileWriter fstream = new FileWriter(filenamepath, true);
-    BufferedWriter out = new BufferedWriter(fstream);
-    out.write("");
-    out.close();
+// Get the file (it is created in testStarted).
+String filenamepath = "runs/tmpfilename.php";
+
+// We add the run info when starting the first thread
+if (JMeterUtils.getProperty("headerprinted") == null) {
+
+    // Output headers.
+    JMeterUtils.setProperty("headerprinted", "1");
+    print(mr.headerToString());
 
     FileWriter fstream = new FileWriter(filenamepath, true);
     BufferedWriter out = new BufferedWriter(fstream);
-    out.write("<?php\n");
     out.write("$host = '"+vars.get("host")+"';\n");
     out.write("$sitepath = '"+vars.get("sitepath")+"';\n");
     out.write("$group = '"+EscapeQuotes(props.get("group"))+"';\n");
@@ -160,16 +160,14 @@ if (!f.exists()) {
     out.write("$sitebranch = '"+EscapeQuotes(props.get("sitebranch"))+"';\n");
     out.write("$sitecommit = '"+EscapeQuotes(props.get("sitecommit"))+"';\n");
     out.close();
+
+    // Send the run timestamp to set it as run filename.
+    props.put("filepath", "runs/" + vars.get("runtimestamp") + ".php");
 }
 
 FileWriter fstream = new FileWriter(filenamepath, true);
 BufferedWriter out = new BufferedWriter(fstream);
 out.write(mr.toPHP());
 out.close();
-
-if (JMeterUtils.getProperty("headerprinted") == null) {
-    JMeterUtils.setProperty("headerprinted", "1");
-    print(mr.headerToString());
-}
 
 print(mr.toString());
