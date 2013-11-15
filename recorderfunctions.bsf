@@ -1,0 +1,18 @@
+import java.io.*;
+import org.apache.commons.lang.StringUtils;
+import org.apache.jmeter.util.JMeterUtils;      // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/util/JMeterUtils.html
+
+
+testStarted(){
+    String filenamepath = "runs/tmpfilename.php";
+    FileWriter fstream = new FileWriter(filenamepath, true);
+    BufferedWriter out = new BufferedWriter(fstream);
+    out.write("<?php\n");
+    out.close();
+}
+
+testEnded(){
+    File from = new File("runs/tmpfilename.php");
+    File to = new File(JMeterUtils.getProperty("filepath"));
+    from.renameTo(to);
+}
