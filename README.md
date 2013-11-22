@@ -111,7 +111,7 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *curl -O http://webserver/moodle/site/path/site_data.properties*
 * Run the before test (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
-    + *./test_runner.sh {groupname} {descriptioname} testusers.csv testplan.jmx site_data.properties*
+    + *./test_runner.sh {groupname} {descriptioname} testplan.jmx testusers.csv site_data.properties*
 * Restore the base state to run the after branch (web server)
     + *cd /path/to/moodle-performance-comparison*
     + *./after_run_setup.sh*
@@ -122,7 +122,7 @@ Note that you can run the tests as many times as you want, you just need to run 
     + *curl -O http://webserver/moodle/site/path/site_data.properties*
 * Run the after test (jmeter server)
     + *cd /path/to/moodle-performance-comparison*
-    + *./test_runner.sh {groupname} {descriptioname} testusers.csv testplan.jmx site_data.properties*
+    + *./test_runner.sh {groupname} {descriptioname} testplan.jmx testusers.csv site_data.properties*
 * Check the results (web server)
     + http://localhost/moodle-performance-comparison/index.php (change to your URL according to your configuration)
 
