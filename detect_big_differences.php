@@ -6,6 +6,12 @@
  * More useful when running it through CLI as
  * it can be easily used from CI servers to check
  * the exit code.
+ *
+ * It takes timestamps (in miliseconds, like the runs files names) in ascending ordered,
+ * so the first one will be considered the before branch and the next one/s the after branches.
+ *
+ * Example:
+ *  php detect_big_differences.php 1231231231231 1231231231232 1231231231233
  */
 
 ini_set('display_errors', true);

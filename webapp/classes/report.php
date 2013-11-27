@@ -97,8 +97,6 @@ class report {
      */
     public function parse_runs(array $timestamps) {
 
-        krsort($timestamps);
-
         foreach ($timestamps as $timestamp) {
 
             if (!is_numeric($timestamp)) {
@@ -126,6 +124,9 @@ class report {
      * @return bool False if problems were found.
      */
     public function make(array $timestamps) {
+
+        // They come from the form in the opposite order.
+        krsort($timestamps);
 
         // Gets the runs data and checks that it is comparable.
         if (!$this->parse_runs($timestamps)) {
