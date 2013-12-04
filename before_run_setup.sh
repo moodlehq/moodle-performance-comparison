@@ -201,6 +201,11 @@ if [[ "$testplanfiles" == *"testplan"* ]]; then
         exit 1
     fi
     ${curlcmd} -o $filenametestplan ${files[0]} -o $filenameusers ${files[1]} --silent
+    curlexitcode=$?
+    if [ "$curlexitcode" -ne "0" ]; then
+        echo "Error: There was a problem getting the test plan files. Check your $wwwroot setting."
+        exit $curlexitcode
+    fi
 else
     echo "Error: There was a problem generating the test plan."
     exit 1
