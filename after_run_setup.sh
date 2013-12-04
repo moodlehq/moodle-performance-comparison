@@ -74,7 +74,7 @@ if [ "$cpexitcode" -ne "0" ]; then
     exit $cpexitcode
 fi
 
-chmod 777 $dataroot -R
+chmod -R 777 $dataroot
 
 # Drop and restore the database.
 if [ "$dbtype" == "pgsql" ]; then
