@@ -27,7 +27,7 @@
 ##############################################
 
 # Exit on errors.
-#set -e
+set -e
 
 # Dependencies.
 . ./lib/lib.sh
@@ -147,15 +147,13 @@ samplerinitstr="-Jbeanshell.listener.init=recorderfunctions.bsf"
 # Run it baby! (without GUI).
 echo "#######################################################################"
 echo "Test running... (time for a coffee?)"
+
+jmetererrormsg="Jmeter can not run, ensure that:
+* The test plan and the users files are ok
+* You provide correct arguments to the script"
+
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $samplerinitstr $includelogsstr $users $loops $rampup $throughput > $runoutput
-jmeterexitcode=$?
-if [ "$jmeterexitcode" -ne "0" ]; then
-    echo "Error: Jmeter can not run, ensure that:"
-    echo "* The test plan and the users files are ok"
-    echo "* You provide correct arguments to the script"
-    exit $jmeterexitcode
-fi
+$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $samplerinitstr $includelogsstr $users $loops $rampup $throughput > $runoutput || throw_error $jmetererrormsg
 
 # TODO Looking for exceptions in the jmeter logs
 

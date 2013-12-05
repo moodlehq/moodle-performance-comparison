@@ -9,7 +9,7 @@
 ##############################################
 
 # Exit on errors.
-#set -e
+set -e
 
 # Dependencies.
 . ./lib/lib.sh
@@ -18,24 +18,24 @@
 load_properties "defaults.properties"
 load_properties "webserver_config.properties"
 
-rm runs/*.php -rf
-rm runs_samples/*.jtl -rf
-rm runs_outputs/*.output -rf
-rm logs/*.log -rf
+delete_files "runs/*.php"
+delete_files "runs_samples/*.jtl"
+delete_files "runs_outputs/*.output"
+delete_files "logs/*.log"
 
 # Also images cache.
-sudo rm cache -rf
+sudo delete_files "cache"
 
 # Also backups.
-sudo rm $backupsdir/* -rf
+sudo delete_files "$backupsdir/*"
 
 # Delete compare files.
 if [ -f "moodle/site_data.properties" ]; then
-    rm moodle/site_data.properties -f
+    delete_files "moodle/site_data.properties" 1
 fi
 
 if [ -f "test_files.properties" ]; then
-    rm test_files.properties -f
+    delete_files "test_files.properties" 1
 fi
 
 outputinfo="

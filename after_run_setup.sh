@@ -15,7 +15,7 @@
 ##############################################
 
 # Exit on errors.
-#set -e
+set -e
 
 # Dependencies.
 . ./lib/lib.sh
@@ -66,13 +66,8 @@ if [ ! -d "$dataroot" ] || [ -z "$dataroot" ]; then
     echo "Error: Armageddon prevented just 2 lines of code above a rm -rf. Please, assign a value to \$dataroot var in webserver_config.properties"
     exit 1
 fi
-rm $dataroot -rf
-cp -r $datarootbackup $dataroot
-cpexitcode=$?
-if [ "$cpexitcode" -ne "0" ]; then
-    echo "Error: code $cpexitcode. $datarootbackup can not be copied to $dataroot"
-    exit $cpexitcode
-fi
+delete_files $dataroot 1
+cp -r $datarootbackup $dataroot || throw_error "$datarootbackup can not be copied to $dataroot"
 
 chmod -R 777 $dataroot
 
@@ -115,12 +110,7 @@ fi
 # Upgrading moodle, although we are not sure that before and after branches are different.
 echo "Upgrading Moodle ($basecommit) to $afterbranch"
 checkout_branch $afterbranchrepository 'after' $afterbranch
-${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null
-upgradeexitcode=$?
-if [ "$upgradeexitcode" -ne "0" ]; then
-    echo "Error: Moodle can not be upgraded to $afterbranch"
-    exit $upgradeexitcode
-fi
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null || throw_error "Moodle can not be upgraded to $afterbranch"
 
 # Stores the site data in an jmeter-accessible file.
 save_moodle_site_data

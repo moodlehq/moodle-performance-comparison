@@ -193,7 +193,6 @@ This tool in only intended to be used in development/testing environments inside
 
 
 ## Troubleshooting
-* In case of unexpected errors ou can uncomment *set -e* at the beginning of the scripts
 * You might be interested in raising the PHP memory_limit to 512MB (apache) or something like that to 'M' or bigger when comparing results.
 * You can find JMeter logs in logs/
 * You can find runs outputs in runs_outputs/ the results in runs_samples/ and the php arrays generated from them in runs/
