@@ -14,7 +14,7 @@
 ##############################################
 
 # Exit on errors.
-#set -e
+set -e
 
 # Dependencies.
 . ./lib/lib.sh
@@ -69,29 +69,22 @@ check_cmds
 
 # Creating & cleaning dirroot & dataroot (keeping .git)
 if [ ! -e "$dataroot" ]; then
-    mkdir -m $permissions $dataroot
-    mkdirexitcode=$?
-    if [ "$mkdirexitcode" -ne "0" ]; then
-        echo "Error: There was a problem creating $dataroot directory"
-        exit $mkdirexitcode
-    fi
+    mkdir -m $permissions $dataroot || throw_error "There was a problem creating $dataroot directory"
+else
+    # If it already existed we clean it
+    delete_files "$dataroot/*"
 fi
-rm $dataroot/* -rf
+
 if [ ! -e "moodle" ]; then
-    mkdir -m $permissions "moodle"
-    mkdirexitcode=$?
-    if [ "$mkdirexitcode" -ne "0" ]; then
-        echo "Error: There was a problem creating moodle/ directory"
-        exit $mkdirexitcode
-    fi
+    mkdir -m $permissions "moodle" || throw_error "There was a problem creating moodle/ directory"
 fi
 
 # Cleaning previous test plan files.
 if [ -e "$filenameusers" ]; then
-    rm "$filenameusers"
+    delete_files "$filenameusers" 1
 fi
 if [ -e "$filenametestplan" ]; then
-    rm "$filenametestplan"
+    delete_files "$filenametestplan" 1
 fi
 
 
@@ -149,48 +142,23 @@ for i in ${replacements}; do
     configfilecontents=$( echo "${configfilecontents}" | sed "s#${i}#g" )
 done
 # Overwrites the previous config.php file.
-echo "${configfilecontents}" > config.php
-permissionsexitcode=$?
-if [ "$permissionsexitcode" -ne "0" ]; then
-    echo "Error: Moodle's config.php can not be written, check $currentwd/moodle directory (and $currentwd/moodle/config.php if it exists) permissions."
-    exit $permissionsexitcode
-fi
+echo "${configfilecontents}" > config.php || throw_error "Moodle's config.php can not be written, check $currentwd/moodle directory (and $currentwd/moodle/config.php if it exists) permissions."
 chmod $permissions config.php
 
 # Install the site with user specified params.
 echo "#######################################################################"
 echo "Installing Moodle ($basecommit)"
-${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" > /dev/null
-installexitcode=$?
-if [ "$installexitcode" -ne "0" ]; then
-    echo "Error: Moodle can not be installed, check that the database data is correctly set"
-    exit $installexitcode
-fi
+${phpcmd} admin/cli/install_database.php --agree-license --fullname="$sitefullname" --shortname="$siteshortname" --adminuser="$siteadminusername" --adminpass="$siteadminpassword" > /dev/null || throw_error "Moodle can not be installed, check that the database data is correctly set"
 
 # Generate courses.
-${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" --quiet > /dev/null
-testsiteexitcode=$?
-if [ "$testsiteexitcode" -ne "0" ]; then
-    echo "Error: The test site can not be generated, check that the site is correctly installed"
-    exit $testsiteexitcode
-fi
+${phpcmd} admin/tool/generator/cli/maketestsite.php --size=$1 --fixeddataset --bypasscheck --filesizelimit="1000" --quiet > /dev/null || throw_error "The test site can not be generated, check that the site is correctly installed"
 
 # Enable advanced settings and list courses in the frontpage.
-${phpcmd} ../set_moodle_site.php
-setsiteexitcode=$?
-if [ "$setsiteexitcode" -ne "0" ]; then
-    echo "Error: The test site can not be configured, check that the site is correctly installed"
-    exit $setsiteexitcode
-fi
+${phpcmd} ../set_moodle_site.php || throw_error "The test site can not be configured, check that the site is correctly installed"
 
 # We capture the output to get the files we will need.
-testplancommand=${phpcmd}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck' > /dev/null
+testplancommand=${phpcmd}' admin/tool/generator/cli/maketestplan.php --size='$1' --shortname='${targetcourse}' --bypasscheck' > /dev/null || throw_error "Moodle's test plan generator could not finish as expected"
 testplanfiles="$(${testplancommand})"
-testplanfileexitcode=$?
-if [ "$testplanfileexitcode" -ne "0" ]; then
-    echo "Error: code $testplanfileexitcode. Moodle's test plan generator could not finish as expected"
-    exit $testplanfileexitcode
-fi
 
 # We only get the first two items as there is more performance info.
 if [[ "$testplanfiles" == *"testplan"* ]]; then
@@ -200,12 +168,7 @@ if [[ "$testplanfiles" == *"testplan"* ]]; then
         echo "Error: There was a problem generating the test plan."
         exit 1
     fi
-    ${curlcmd} -o $filenametestplan ${files[0]} -o $filenameusers ${files[1]} --silent
-    curlexitcode=$?
-    if [ "$curlexitcode" -ne "0" ]; then
-        echo "Error: There was a problem getting the test plan files. Check your $wwwroot setting."
-        exit $curlexitcode
-    fi
+    ${curlcmd} -o $filenametestplan ${files[0]} -o $filenameusers ${files[1]} --silent || throw_error "There was a problem getting the test plan files. Check your $wwwroot setting."
 else
     echo "Error: There was a problem generating the test plan."
     exit 1
@@ -213,12 +176,7 @@ fi
 
 # Backups.
 if [ ! -e "$backupsdir" ]; then
-    mkdir -m $permissions $backupsdir
-    mkdirexitcode=$?
-    if [ "$mkdirexitcode" -ne "0" ]; then
-        echo "Error: There was a problem creating $backupsdir directory"
-        exit $mkdirexitcode
-    fi
+    mkdir -m $permissions $backupsdir || throw_error "There was a problem creating $backupsdir directory"
 
 fi
 datesufix=`date '+%Y%m%d%H%M'`
@@ -227,14 +185,8 @@ filenamedatabase="$backupsdir/database_backup_$datesufix.sql"
 
 # Dataroot backup.
 echo "Creating Moodle ($basecommit) database and dataroot backups"
-rm -rf $dataroot/sessions
-cp -r $dataroot $filenamedataroot
-cpexitcode=$?
-if [ "$cpexitcode" -ne "0" ]; then
-    echo "Error: code $cpexitcode. $dataroot can not be copied to $filenamedataroot"
-    exit $cpexitcode
-fi
-
+delete_files "$dataroot/sessions"
+cp -r $dataroot $filenamedataroot || throw_error "$dataroot can not be copied to $filenamedataroot"
 
 # Database backup.
 if [ "$dbtype" == "pgsql" ]; then
@@ -253,23 +205,12 @@ generatedfiles="testplanfile=$filenametestplan
 testusersfile=$filenameusers
 datarootbackup=$filenamedataroot
 databasebackup=$filenamedatabase"
-echo "$generatedfiles" > "$currentwd/test_files.properties"
-fileexitcode=$?
-if [ "$fileexitcode" -ne "0" ]; then
-    echo "Error: code $fileexitcode. Moodle can not add the info about the generated files to $currentwd/test_files.properties check the permissions"
-    exit $fileexitcode
-fi
-
+echo "$generatedfiles" > "$currentwd/test_files.properties" || throw_error "Moodle can not add the info about the generated files to $currentwd/test_files.properties check the permissions"
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
 echo "Upgrading Moodle ($basecommit) to $beforebranch"
 checkout_branch $beforebranchrepository 'before' $beforebranch
-${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null
-upgradeexitcode=$?
-if [ "$upgradeexitcode" -ne "0" ]; then
-    echo "Error: Moodle can not be upgraded to $beforebranch"
-    exit $upgradeexitcode
-fi
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null || throw_error "Moodle can not be upgraded to $beforebranch"
 
 # Stores the site data in an jmeter-accessible file.
 save_moodle_site_data
