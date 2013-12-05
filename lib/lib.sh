@@ -1,64 +1,63 @@
 #!/bin/bash
 
+# Checks that last command was successfully executed, otherwise exits showing an error. Expects $1 to be the error message
+throw_error()
+{
+    errorcode=$?
+    if [ "$errorcode" -ne "0" ]; then
+
+        # Print the provided error message.
+        if [ ! -z "$1" ]; then
+            echo "Error: $1"
+        fi
+
+        # Exit using the last command error code.
+        exit $errorcode
+    fi
+}
+
+# Expects $1 to be the files to delete; to set $2 will make the function exit if it is an unexisting file. Accepts dir/*.extension format like ls or rm does.
+delete_files()
+{
+    # Checking that the provided value is not empty or it is a "dangerous" value. We can not prevent anything, just a few of them.
+    if [ -z "$1" ] || [ "$1" == "." ] || [ "$1" == ".." ] || [ "$1" == "/" ] || [ "$1" == "./" ] || [ "$1" == "../" ] || [ "$1" == "*" ] || [ "$1" == "./*" ] || [ "$1" == "../*" ]; then
+        echo "Error: delete_files() does not accept \"$1\" as something to delete"
+        exit 1
+    fi
+
+    # Checking that the directory exists. Exiting as it is a development issue.
+    if [ ! -z "$2" ]; then
+        test -e "$1" || throw_error "The provided \"$1\" file or directory does not exist or is not valid."
+    fi
+
+    # Kill them all (ok, yes, we don't always require that options).
+    rm -rf "$1"
+}
+
 # Checks that the provided cmd commands are properly set.
 check_cmds()
 {
     genericstr=" has a valid value or overwrite the default one using webserver_config.properties"
 
-    ${phpcmd} -v > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $phpcmd'$genericstr
-        exit $errorcode
-    fi
+    ${phpcmd} -v > /dev/null || throw_error 'Ensure $phpcmd'$genericstr
 
     # Only if mysql is being used.
     if [ "$dbtype" == "mysqli" ]; then
-        ${mysqlcmd} -V > /dev/null
-        errorcode=$?
-        if [ "$errorcode" != 0 ]; then
-            echo 'Error: Ensure $mysqlcmd'$genericstr
-            exit $errorcode
-        fi
+        ${mysqlcmd} -V > /dev/null || throw_error 'Ensure $mysqlcmd'$genericstr
 
-        ${mysqldumpcmd} -V > /dev/null
-        errorcode=$?
-        if [ "$errorcode" != 0 ]; then
-            echo 'Error: Ensure $mysqldumpcmd'$genericstr
-            exit $errorcode
-        fi
+        ${mysqldumpcmd} -V > /dev/null || throw_error 'Ensure $mysqldumpcmd'$genericstr
     fi
 
     # Only if pgsql is being used.
     if [ "$dbtype" == "pgsql" ]; then
-        ${pgsqlcmd} --version > /dev/null
-        errorcode=$?
-        if [ "$errorcode" != 0 ]; then
-            echo 'Error: Ensure $pgsqlcmd'$genericstr
-            exit $errorcode
-        fi
+        ${pgsqlcmd} --version > /dev/null || throw_error 'Ensure $pgsqlcmd'$genericstr
 
-        ${pgsqldumpcmd} --version > /dev/null
-        errorcode=$?
-        if [ "$errorcode" != 0 ]; then
-            echo 'Error: Ensure $pgsqldumpcmd'$genericstr
-            exit $errorcode
-        fi
+        ${pgsqldumpcmd} --version > /dev/null || throw_error 'Ensure $pgsqldumpcmd'$genericstr
     fi
 
-    ${gitcmd} version > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $gitcmd'$genericstr
-        exit $errorcode
-    fi
+    ${gitcmd} version > /dev/null || throw_error 'Ensure $gitcmd'$genericstr
 
-    ${curlcmd} -V > /dev/null
-    errorcode=$?
-    if [ "$errorcode" != 0 ]; then
-        echo 'Error: Ensure $curlcmd'$genericstr
-        exit $errorcode
-    fi
+    ${curlcmd} -V > /dev/null || throw_error 'Ensure $curlcmd'$genericstr
 }
 
 # Loads configuration and static vars. Should be a first include before moving to other directories.
@@ -90,20 +89,14 @@ checkout_branch()
         # Remove the remote if it already exists and it is different.
         remoteinfo="$( ${gitcmd} remote show "$2" -n | head -n 3 )"
         if [[ ! "$remoteinfo" == *$1* ]]; then
-            ${gitcmd} remote rm $2
-            ${gitcmd} remote add $2 $1
+            ${gitcmd} remote rm $2 || throw_error "$1 remote value you provide can not be removed. Check webserver_config.properties.dist"
+            ${gitcmd} remote add $2 $1 || throw_error "$1 remote value you provided can not be added as $2. Check webserver_config.properties.dist"
         fi
     else
-        ${gitcmd} remote add $2 $1
-    fi
-    remoteexitcode=$?
-    if [ "$remoteexitcode" -ne "0" ]; then
-        echo "Error: The '$1' remote value you provided does not exist or it is not set. Check webserver_config.properties.dist"
-        exit $remoteexitcode
+        ${gitcmd} remote add $2 $1 || throw_error "$1 remote can not be added as $2. Check webserver_config.properties.dist"
     fi
 
-
-    ${gitcmd} fetch $2 --quiet
+    ${gitcmd} fetch $2 --quiet || throw_error "$2 remote can not be fetched. Check webserver_config.properties.dist"
 
     # Checking if it is a branch or a hash.
     isareference="$( ${gitcmd} show-ref | grep "refs/remotes/$2/$3" | wc -l )"
@@ -111,21 +104,11 @@ checkout_branch()
 
         # Checkout the last version of the branch.
         # Reset to avoid conflicts if there are git history changes.
-        ${gitcmd} checkout -B $3 $2/$3 --quiet
-        checkoutexitcode=$?
-        if [ "$checkoutexitcode" -ne "0" ]; then
-            echo "Error: The '$3' tag or branch you provided does not exist or it is not set. Check webserver_config.properties.dist"
-            exit $checkoutexitcode
-        fi
+        ${gitcmd} checkout -B $3 $2/$3 --quiet || throw_error "The '$3' tag or branch you provided does not exist or it is not set. Check webserver_config.properties.dist"
 
     else
         # Just checkout the hash and let if fail if it is incorrect.
-        ${gitcmd} checkout $3 --quiet
-        checkoutexitcode=$?
-        if [ "$checkoutexitcode" -ne "0" ]; then
-            echo "Error: The '$3' hash you provided does not exist or it is not set. Check webserver_config.properties.dist"
-            exit $checkoutexitcode
-        fi
+        ${gitcmd} checkout $3 --quiet || throw_error "The '$3' hash you provided does not exist or it is not set. Check webserver_config.properties.dist"
 
     fi
 
@@ -160,10 +143,5 @@ save_moodle_site_data()
 sitebranch=\"$sitebranch\"
 sitecommit=\"$sitecommit\""
 
-    echo "${sitedatacontents}" > site_data.properties
-    permissionsexitcode=$?
-    if [ "$permissionsexitcode" -ne "0" ]; then
-        echo "Error: Site data properties file can not be written, check $currentwd/moodle directory permissions."
-        exit $permissionsexitcode
-    fi
+    echo "${sitedatacontents}" > site_data.properties || throw_error "Site data properties file can not be written, check $currentwd/moodle directory permissions."
 }
