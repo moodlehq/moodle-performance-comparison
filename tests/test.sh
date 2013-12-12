@@ -31,8 +31,8 @@ check_output()
 {
     output=$( $1 )
     if [[ "$output" != *"$2"* ]]; then
-        echo "Test failed: "$output
-        echo $3
+        echo "Test failed: "$output >&2
+        echo $3 >&2
 
         # Clean the tool.
         clean_test
@@ -53,7 +53,7 @@ cd ..
 
 # Ensure that the tool is not set up. This should be a framework level failure.
 if [ -f "moodle" ] || [ -f "webserver_config.properties" ] || [ -f "jmeter_config.properties" ]; then
-    echo "Error: The tool has been previously used or initialized, checkout a new clone and run the tests there."
+    echo "Error: The tool has been previously used or initialized, checkout a new clone and run the tests there." >&2
     exit 1
 fi
 

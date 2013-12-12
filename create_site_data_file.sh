@@ -1,6 +1,5 @@
 #!/bin/bash
-
-##############################################
+#
 # Creates a site_data.properties file with the moodle/ site version data.
 #
 # Useful when using your own SQL dump and you can't use before_run_setup.sh

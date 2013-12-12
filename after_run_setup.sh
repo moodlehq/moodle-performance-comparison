@@ -1,6 +1,5 @@
 #!/bin/bash
-
-##############################################
+#
 # Prepares the next test run after finished running the before_run_setup.sh script.
 # * Restores database
 # * Restores dataroot
@@ -29,22 +28,23 @@ Prepares the next test run after finished running the before_run_setup.sh script
 * Restores dataroot
 * Upgrades moodle if necessary
 "
-    echo "$output"
+    echo "$output" >&2
     exit 1
 fi
 
-# Checking as much as we can that before_run_setup.sh was already executed and finished successfully.
+# Checking as much as we can that before_run_setup.sh was
+# already executed and finished successfully.
 errormsg="Error: Did you run before_run_test.sh before running this one? "
 if [ ! -e "test_files.properties" ]; then
-    echo $errormsg
+    echo $errormsg >&2
     exit 1
 fi
 if [ ! -d "moodle" ]; then
-    echo $errormsg
+    echo $errormsg >&2
     exit 1
 fi
 if [ ! -d "moodle/.git" ]; then
-    echo $errormsg
+    echo $errormsg >&2
     exit 1
 fi
 
@@ -63,11 +63,13 @@ cd moodle
 
 # Remove current dataroot and restore the provided one (Better using chown...).
 if [ ! -d "$dataroot" ] || [ -z "$dataroot" ]; then
-    echo "Error: Armageddon prevented just 2 lines of code above a rm -rf. Please, assign a value to \$dataroot var in webserver_config.properties"
+    echo "Error: Armageddon prevented just 2 lines of code above a rm -rf.
+Please, assign a value to \$dataroot var in webserver_config.properties" >&2
     exit 1
 fi
 delete_files $dataroot 1
-cp -r $datarootbackup $dataroot || throw_error "$datarootbackup can not be copied to $dataroot"
+cp -r $datarootbackup $dataroot || \
+    throw_error "$datarootbackup can not be copied to $dataroot"
 
 chmod -R 777 $dataroot
 
@@ -78,24 +80,58 @@ if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
 
     # Checking that the table exists.
-    databaseexists="$( ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -l | grep "$dbname" | wc -l )"
+    databaseexists="$( ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -l | \
+        grep "$dbname" | \
+        wc -l )"
     if [ "$databaseexists" != "0" ]; then
-        ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "DROP DATABASE $dbname" --quiet
+        ${pgsqlcmd} \
+            -h "$dbhost" \
+            -U "$dbuser" \
+            -d template1 \
+            -c "DROP DATABASE $dbname" \
+            --quiet
     fi
-    ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -d template1 -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
-    ${pgsqlcmd} --quiet -h "$dbhost" -U "$dbuser" $dbname < $databasebackup > /dev/null
+    ${pgsqlcmd} \
+        -h "$dbhost" \
+        -U "$dbuser" \
+        -d template1 \
+        -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" --quiet
+    ${pgsqlcmd} \
+        --quiet \
+        -h "$dbhost" \
+        -U "$dbuser" \
+        $dbname < $databasebackup > /dev/null
 
 elif [ "$dbtype" == "mysqli" ]; then
     echo "#######################################################################"
     echo "Restoring database and dataroot to Moodle ($basecommit)"
 
     # Checking that the table exists.
-    databaseexists="$( ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "SHOW DATABASES LIKE '$dbname'" )"
+    databaseexists="$( ${mysqlcmd} \
+        --host=${dbhost} \
+        --user=${dbuser} \
+        --password=${dbpass} \
+        -e "SHOW DATABASES LIKE '$dbname'" )"
     if [ ! -z "$databaseexists" ];then
-        ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "DROP DATABASE $dbname" --silent
+        ${mysqlcmd} \
+            --host=${dbhost} \
+            --user=${dbuser} \
+            --password=${dbpass} \
+            -e "DROP DATABASE $dbname" \
+            --silent
     fi
-    ${mysqlcmd} --host=${dbhost} --user=${dbuser} --password=${dbpass} -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" --silent
-    ${mysqlcmd} --silent --host=${dbhost} --user=${dbuser} --password=${dbpass} $dbname < $databasebackup > /dev/null
+    ${mysqlcmd} \
+        --host=${dbhost} \
+        --user=${dbuser} \
+        --password=${dbpass} \
+        -e "CREATE DATABASE $dbname DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_unicode_ci" \
+        --silent
+    ${mysqlcmd} \
+        --silent \
+        --host=${dbhost} \
+        --user=${dbuser} \
+        --password=${dbpass} \
+        $dbname < $databasebackup > /dev/null
 else
     confirmoutput="Only postgres and mysql support: You need to manually restore your database. 
 Press [q] to stop the script or, if you have already done it, any other key to continue.
@@ -110,7 +146,8 @@ fi
 # Upgrading moodle, although we are not sure that before and after branches are different.
 echo "Upgrading Moodle ($basecommit) to $afterbranch"
 checkout_branch $afterbranchrepository 'after' $afterbranch
-${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null || throw_error "Moodle can not be upgraded to $afterbranch"
+${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null || \
+    throw_error "Moodle can not be upgraded to $afterbranch"
 
 # Stores the site data in an jmeter-accessible file.
 save_moodle_site_data
@@ -127,7 +164,8 @@ Now you can:
 - Change the site configuration
 - Change the cache stores
 And to continue with the test you should:
-- Run restart_services.sh (or manually restart web and database servers if this script doesn\'t suit your system)
+- Run restart_services.sh (or manually restart web and database servers
+  if this script doesn\'t suit your system)
 - Run test_runner.sh
 "
 
