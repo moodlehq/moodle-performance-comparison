@@ -1,6 +1,5 @@
 #!/bin/bash
-
-##############################################
+#
 # Restarts the services
 #
 # Not specially compatible with a wide range of server
@@ -29,7 +28,7 @@ check_cmds
 
 # Only root access; prevents ugly service command error messages.
 if [ "$(id -u)" != "0" ]; then
-    echo "Error: You can only run this script as root"
+    echo "Error: You can only run this script as root" >&2
     exit 1
 fi
 

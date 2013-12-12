@@ -1,6 +1,5 @@
 #!/bin/bash
-
-##############################################
+#
 # Script to run the test plan using jmeter
 #
 # Runs will be grouped according to $1 so they
@@ -36,19 +35,20 @@ set -e
 load_properties "defaults.properties"
 load_properties "jmeter_config.properties"
 
-# Load the generated files locations (when jmeter is running in the same server than the web server).
+# Load the generated files locations
+# (when jmeter is running in the same server than the web server).
 if [ -e "test_files.properties" ]; then
     load_properties "test_files.properties"
 fi
 
 if [ "$#" -lt 2 ]; then
-    echo "Error: Not enough arguments. Open test_runner.sh for more details."
+    echo "Error: Not enough arguments. Open test_runner.sh for more details." >&2
     exit 1
 fi
 
 # Getting jmeter custom options.
 while [ $# -gt 0 ]; do
-    case $1 in
+    case "$1" in
         -u)
             users=" -Jusers=$2"
             shift 2
@@ -116,7 +116,7 @@ if [ ! -z "$sitedatafilearg" ]; then
     sitedatafile=$sitedatafilearg
 fi
 if [ ! -e "$sitedatafile" ]; then
-    echo "Error: The specified site data properties file does not exist."
+    echo "Error: The specified site data properties file does not exist." >&2
     exit 1
 fi
 load_properties $sitedatafile
@@ -124,7 +124,7 @@ load_properties $sitedatafile
 
 # If there is no test_files.properties and no files were provided we throw an error.
 if [ -z "$testplanfile" ] || [ -z "$testusersfile" ]; then
-    echo "Usage: `basename $0` {run_group} {run_description} {test_plan_file_path} {users_file_path}"
+    echo "Usage: `basename $0` {run_group} {run_description} {test_plan_file_path} {users_file_path}" >&2
     exit 1
 fi
 
@@ -153,15 +153,34 @@ jmetererrormsg="Jmeter can not run, ensure that:
 * You provide correct arguments to the script"
 
 jmeterbin=$jmeter_path/bin/jmeter
-$jmeterbin -n -j "$logfile" -t "$testplanfile" -Jusersfile="$testusersfile" -Jgroup="$group" -Jdesc="$description" -Jsiteversion="$siteversion" -Jsitebranch="$sitebranch" -Jsitecommit="$sitecommit" $samplerinitstr $includelogsstr $users $loops $rampup $throughput > $runoutput || throw_error $jmetererrormsg
+$jmeterbin \
+    -n \
+    -j "$logfile" \
+    -t "$testplanfile" \
+    -Jusersfile="$testusersfile" \
+    -Jgroup="$group" \
+    -Jdesc="$description" \
+    -Jsiteversion="$siteversion" \
+    -Jsitebranch="$sitebranch" \
+    -Jsitecommit="$sitecommit" \
+    $samplerinitstr \
+    $includelogsstr \
+    $users \
+    $loops \
+    $rampup \
+    $throughput \
+    > $runoutput || \
+    throw_error $jmetererrormsg
 
-# TODO Looking for exceptions in the jmeter logs
+# TODO Looking for exceptions in the jmeter logs:
+# https://github.com/moodlehq/moodle-performance-comparison/issues/39
 
 outputinfo="
 #######################################################################
 Test plan completed successfully.
 
-To compare this run with others remember to execute after_run_setup.sh before it to clean the site restoring the database and the dataroot.
+To compare this run with others remember to execute after_run_setup.sh before
+it to clean the site restoring the database and the dataroot.
 "
 echo "$outputinfo"
 exit 0
