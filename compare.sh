@@ -1,6 +1,5 @@
 #!/bin/bash
-
-##############################################
+#
 # Runs the whole scripts chain and opens the browser once finished to compare results
 #
 # Note that this is only useful when running jmeter in the moodle site server
@@ -31,17 +30,21 @@ timestart=`date +%s`
 groupname="compare_"`date '+%Y%m%d%H%M'`
 
 # Hardcoding S as the size, with 5 loops is enough to have consistent results.
-./before_run_setup.sh S || throw_error "Before run setup didn't finish as expected"
+./before_run_setup.sh S || \
+    throw_error "Before run setup didn't finish as expected"
 
-./test_runner.sh "$groupname" "before" || throw_error "The before test run didn't finish as expected"
+./test_runner.sh "$groupname" "before" || \
+    throw_error "The before test run didn't finish as expected"
 
 # We don't restart the browser here, this is a development machine
 # and probably you are not staring at the CLI waiting for it to
 # finish.
 
-./after_run_setup.sh || throw_error "After run setup didn't finish as expected"
+./after_run_setup.sh || \
+    throw_error "After run setup didn't finish as expected"
 
-./test_runner.sh "$groupname" "after" || throw_error "The after test run didn't finish as expected"
+./test_runner.sh "$groupname" "after" || \
+    throw_error "The after test run didn't finish as expected"
 
 timeend=`date +%s`
 
