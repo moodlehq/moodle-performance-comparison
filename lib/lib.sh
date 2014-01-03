@@ -37,7 +37,8 @@ throw_error()
 ################################################
 delete_files()
 {
-    # Checking that the provided value is not empty or it is a "dangerous" value. We can not prevent anything, just a few of them.
+    # Checking that the provided value is not empty or it is a "dangerous" value.
+    # We can not prevent anything, just a few of them.
     if [ -z "$1" ] || \
             [ "$1" == "." ] || \
             [ "$1" == ".." ] || \

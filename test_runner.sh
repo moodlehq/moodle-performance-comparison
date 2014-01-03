@@ -172,8 +172,24 @@ $jmeterbin \
     > $runoutput || \
     throw_error $jmetererrormsg
 
-# TODO Looking for exceptions in the jmeter logs:
-# https://github.com/moodlehq/moodle-performance-comparison/issues/39
+# Log file correctly generated.
+if [ ! -f $logfile ]; then
+  echo "Error: JMeter has not generated any log file in $logfile"
+  exit 1
+fi
+
+# Grep the logs looking for errors and warnings.
+for errorkey in ERROR WARN; do
+
+  # Also checking that the errorkey is the log entry type.
+  if grep $errorkey $logfile | awk '{print $3}' | grep -q $errorkey ; then
+
+    echo "Error: \"$errorkey\" found in jmeter logs, read $logfile \
+to see the full trace. If you think that this is a false failure report the \
+issue in https://github.com/moodlehq/moodle-performance-comparison/issues."
+    exit 1
+  fi
+done
 
 outputinfo="
 #######################################################################
