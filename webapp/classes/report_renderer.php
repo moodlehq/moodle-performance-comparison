@@ -54,7 +54,14 @@ class report_renderer {
     protected function output_head() {
 
         google_charts_renderer::render();
-        return '<link rel="stylesheet" type="text/css" href="webapp/styles.css" />';
+
+        $head = '<script src="webapp/js/jquery.js"></script>';
+        $head .= '<script src="webapp/js/jquery-ui.js"></script>';
+        $head .= '<script src="webapp/js/ui.js"></script>';
+        $head .= '<link rel="stylesheet" type="text/css" href="webapp/css/styles.css" />';
+        $head .= '<link rel="stylesheet" type="text/css" href="webapp/css/redmond/jquery-ui.css" />';
+
+        return $head;
     }
 
     /**
@@ -159,12 +166,25 @@ class report_renderer {
             return false;
         }
 
-        $runinfo = array();
+        $runsinfo = array();
         foreach ($this->report->get_runs() as $run) {
-            $runinfo[] = $this->get_info_container($run->get_run_info());
+
+            // Run vars.
+            $runinfo = $run->get_run_info();
+
+            $filenamestr = 'filename=' . $run->get_filename(false);
+            $returnurlstr = 'returnurl=' . urlencode('timestamps[]=' . implode('&timestamps[]=', $_GET['timestamps']));
+            // Adding links to download and to delete.
+            $runinfo->downloadlink = '<a href="download_run.php?' . $filenamestr . '">Download</a>';
+            $runinfo->deletelink = '<a href="delete_run.php?' . $filenamestr . '&' . $returnurlstr . '" class="delete-run">Delete</a>';
+
+            $runsinfo[] = $this->get_info_container($runinfo);
         }
 
-        return $this->create_table('Runs information', $runinfo, count($runinfo));
+        $output = '<div id="confirm-delete-dialog" title="Delete" class=""><p>Are you sure you want to delete this run?</p></div>';
+        $output .= $this->create_table('Runs information', $runsinfo, count($runsinfo), '', 'runs-info');
+
+        return $output;
     }
 
     /**
@@ -254,11 +274,21 @@ class report_renderer {
      * @param array $cells The cells data
      * @param int $nrows The number of cols per row
      * @param string $class The CSS class
+     * @param string $id The id of the div
      * @return string HTML
      */
-    protected function create_table($title, $cells, $ncols, $class = 'container') {
+    protected function create_table($title, $cells, $ncols, $class = '', $id = false) {
 
-        $output = '<div class="section">' . PHP_EOL;
+        if ($class == '') {
+            $class = 'container';
+        }
+
+        $idstr = '';
+        if ($id) {
+            $idstr = ' id="' . $id . '"';
+        }
+
+        $output = '<div class="section"' . $idstr . '>' . PHP_EOL;
         $output .= '<h2>' . $title . '</h2>' . PHP_EOL;
         $output .= '<table class="' . $class . '"><tr>' . PHP_EOL;
         for ($i = 0; $i < count($cells); $i++) {

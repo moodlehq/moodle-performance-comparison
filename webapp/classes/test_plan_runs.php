@@ -221,6 +221,55 @@ class test_plan_run {
     }
 
     /**
+     * Deletes the current run.
+     *
+     * It has been confirmed in client side.
+     * @return bool
+     */
+    public function delete() {
+
+        $filepath = __DIR__ . '/../../runs/' . $this->get_filename();
+
+        if (!is_writable($filepath)) {
+            echo "No permissions to delete $filepath file.<br/><br/>Probably the file was created " .
+                "before https://github.com/moodlehq/moodle-performance-comparison/issues/10 " .
+                "was integrated; delete it manually or change the file permissions.<br/>";
+            return false;
+        }
+
+        return unlink($filepath);
+    }
+
+    /**
+     * Returns the specified file
+     *
+     * PHP files are interpreted, so we return a file from tmp.
+     *
+     * @return void
+     */
+    public function download() {
+
+        $filepath = __DIR__ . '/../../runs/' . $this->get_filename();
+
+        if (!file_exists($filepath)) {
+            die("The specified $filepath file does not exist");
+        }
+
+        $downloadedfilename = basename($filepath);
+        header('Content-Description: File Transfer');
+        header('Content-Type: text/plain');
+        header('Content-Disposition: attachment; filename=' . $downloadedfilename);
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($filepath));
+        ob_clean();
+        flush();
+        readfile($filepath);
+        exit;
+    }
+
+    /**
      * Gets the run data.
      *
      * @param int $timestamp
