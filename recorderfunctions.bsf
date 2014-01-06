@@ -15,4 +15,6 @@ testEnded(){
     File from = new File("runs/tmpfilename.php");
     File to = new File(JMeterUtils.getProperty("filepath"));
     from.renameTo(to);
+    to.setReadable(true, false);
+    to.setWritable(true, false);
 }

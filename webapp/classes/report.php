@@ -213,7 +213,11 @@ class report {
         $dir = __DIR__ . '/../../' . self::RUNS_RELATIVE_PATH;
         if ($dh = opendir($dir)) {
             while (($filename = readdir($dh)) !== false) {
-                if ($filename != '.' && $filename != '..' && $filename != 'empty') {
+
+                // We only want the run files that are ready.
+                if ($filename != '.' && $filename != '..' &&
+                        $filename != 'empty' && $filename != 'tmpfilename.php') {
+
                     $timestamp = preg_replace("/[^0-9]/","", $filename);
                     $runfiles[$timestamp] = new test_plan_run($timestamp);
 

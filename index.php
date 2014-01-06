@@ -1,13 +1,6 @@
 <?php
 
-ini_set('display_errors', true);
-ini_set('error_reporting', E_ALL);
-
-require_once(__DIR__ . '/webapp/classes/google_charts_renderer.php');
-require_once(__DIR__ . '/webapp/classes/google_chart.php');
-require_once(__DIR__ . '/webapp/classes/test_plan_runs.php');
-require_once(__DIR__ . '/webapp/classes/report_renderer.php');
-require_once(__DIR__ . '/webapp/classes/report.php');
+include(__DIR__ . '/webapp/inc.php');
 
 $report = new report();
 
