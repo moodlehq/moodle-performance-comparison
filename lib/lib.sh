@@ -219,7 +219,8 @@ save_moodle_site_data()
         grep -o '[0-9]\+' | \
         head -n 1)"
     local sitecommit="$(${gitcmd} show --oneline | \
-        head -n 1)"
+        head -n 1 | \
+        sed 's/\"/\\"/g')"
 
     local sitedatacontents="siteversion=\"$siteversion\"
 sitebranch=\"$sitebranch\"
