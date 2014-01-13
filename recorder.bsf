@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.regex.*;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.util.JMeterUtils;      // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/util/JMeterUtils.html
 import org.apache.jmeter.threads.JMeterContext; // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/threads/JMeterContext.html
 import org.apache.jmeter.samplers.SampleResult; // http://jakarta.apache.org/jmeter/api/org/apache/jmeter/samplers/SampleResult.html
