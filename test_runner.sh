@@ -152,7 +152,7 @@ jmetererrormsg="Jmeter can not run, ensure that:
 * The test plan and the users files are ok
 * You provide correct arguments to the script"
 
-jmeterbin=$jmeter_path/bin/jmeter
+jmeterbin=${jmeter_path%/}/bin/jmeter
 $jmeterbin \
     -n \
     -j "$logfile" \

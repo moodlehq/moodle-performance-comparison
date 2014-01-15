@@ -35,7 +35,8 @@ There are scripts for both the web server and the JMeter server sides.
 * Git
 * cURL
 * PHP 5.3
-* JMeter - https://jmeter.apache.org/download_jmeter.cgi (probably you will face problems using apt-get or other package management systems to download it)
+* Java 6 or later
+* JMeter - https://jmeter.apache.org/download_jmeter.cgi binaries (probably you will face problems using apt-get or other package management systems to download it)
 
 ## Installation
 
@@ -76,6 +77,8 @@ The simplest is to just execute *compare.sh*, but it will only work in developme
 The groupname and description arguments of test_runner.sh are useful to identify the run when comparing results, you can use it to set the branch name, the settings you used or whatever will help you identify which run is it.
 
 Note that you can run the tests as many times as you want, you just need to run after_run_setup.sh and restart_services.sh before running test_runner.sh every time to clean up the site.
+
+It is recommendable that you run all the scripts using the same user (there is no need to use a root user at all) you can use different users to run them (there are no restrictions about it) but be sure that the permissions are correct, it seems to be one of the more common issues when running this tool.
 
 ### Web and JMeter servers in the same computer, to find performance differences between different branches (usually a development computer)
 * Run compare.sh, the browser will be automatically opened after both runs are finished
@@ -193,6 +196,7 @@ This tool in only intended to be used in development/testing environments inside
 
 
 ## Troubleshooting
+* You can find an extensive troubleshooting guide [here](https://github.com/moodlehq/moodle-performance-comparison/blob/master/TROUBLESHOOTING.md)
 * You might be interested in raising the PHP memory_limit to 512MB (apache) or something like that to 'M' or bigger when comparing results.
 * You can find JMeter logs in logs/
 * You can find runs outputs in runs_outputs/ the results in runs_samples/ and the php arrays generated from them in runs/
