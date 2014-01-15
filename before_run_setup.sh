@@ -192,6 +192,15 @@ ${phpcmd} admin/cli/install_database.php \
     > /dev/null || \
     throw_error "Moodle can not be installed, check that the database data is correctly set"
 
+# Check that the installed site is properly installed and can be accessed
+# using the provided wwwroot.
+siteindex="${wwwroot%/}/index.php"
+${curlcmd} --silent "$siteindex" | \
+    grep --quiet "$SITE_FULL_NAME" || \
+    throw_error "There is a problem with your wwwroot config var or with \
+the test site. Browse to $wwwroot and ensure you see a moodle site."
+
+
 # Generate courses.
 ${phpcmd} admin/tool/generator/cli/maketestsite.php \
     --size=$1 \
@@ -227,7 +236,7 @@ if [[ "$testplanfiles" == *"testplan"* ]]; then
         -o $FILE_NAME_TEST_PLAN ${files[0]} \
         -o $FILE_NAME_USERS ${files[1]} \
         --silent || \
-        throw_error "There was a problem getting the test plan files. Check your $wwwroot setting."
+        throw_error "There was a problem getting the test plan files. Check your wwwroot setting."
 else
     echo "Error: There was a problem generating the test plan." >&2
     exit 1
