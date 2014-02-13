@@ -166,6 +166,9 @@ class report_renderer {
             return false;
         }
 
+        // Is the web interface read only?.
+        $properties = properties_reader::get('readonlyweb');
+
         $runsinfo = array();
         foreach ($this->report->get_runs() as $run) {
 
@@ -173,10 +176,16 @@ class report_renderer {
             $runinfo = $run->get_run_info();
 
             $filenamestr = 'filename=' . $run->get_filename(false);
-            $returnurlstr = 'returnurl=' . urlencode('timestamps[]=' . implode('&timestamps[]=', $_GET['timestamps']));
-            // Adding links to download and to delete.
+
+            // Link to download the run.
             $runinfo->downloadlink = '<a href="download_run.php?' . $filenamestr . '">Download</a>';
-            $runinfo->deletelink = '<a href="delete_run.php?' . $filenamestr . '&' . $returnurlstr . '" class="delete-run">Delete</a>';
+
+            // Only if the web is read/write.
+            if (empty($properties['readonlyweb'])) {
+                // Link to delete the run.
+                $returnurlstr = 'returnurl=' . urlencode('timestamps[]=' . implode('&timestamps[]=', $_GET['timestamps']));
+                $runinfo->deletelink = '<a href="delete_run.php?' . $filenamestr . '&' . $returnurlstr . '" class="delete-run">Delete</a>';
+            }
 
             $runsinfo[] = $this->get_info_container($runinfo);
         }
