@@ -2,6 +2,11 @@
 
 include(__DIR__ . '/webapp/inc.php');
 
+$properties = properties_reader::get('readonlyweb');
+if (!empty($properties['readonlyweb'])) {
+    die('Error: You are not allowed to perform write actions from the web interface');
+}
+
 if (!$filename = $_GET['filename']) {
     die('Error: No filename to delete');
 }

@@ -335,6 +335,8 @@ class report {
     }
 
     /**
+     * Gets the default thresholds.
+     *
      * Hopefully your eyes will not burn after reading this function's code.
      *
      * Uses the .properties files looking for the threshold values. Gives preference to
@@ -344,71 +346,29 @@ class report {
      */
     protected function get_default_thresholds() {
 
+        // Read values from the properties file.
         $vars = array('groupedthreshold', 'singlestepthreshold', 'thresholds');
-
-        // Ordered by preference.
-        $files = array(
-            __DIR__ . '/../../jmeter_config.properties',
-            __DIR__ . '/../../defaults.properties'
-        );
-
-        foreach ($files as $file) {
-
-            // Open the file and read each line.
-            if ($fh = fopen($file, 'r')) {
-                while (($line = fgets($fh)) !== false) {
-
-                    foreach ($vars as $var) {
-                        $return = $this->extract_threshold_value($var, $line);
-                        if ($return && empty($$var)) {
-                            $$var = $return;
-                        }
-                    }
-                }
-            }
-        }
+        $properties = properties_reader::get($vars);
 
         // There will always be a value in defaults.properties.
-        if (empty($groupedthreshold) || empty($singlestepthreshold)) {
+        if (empty($properties['groupedthreshold']) || empty($properties['singlestepthreshold'])) {
             die('Error: defaults.properties thresholds values can not be found' . PHP_EOL);
         }
 
         // Preference to $thresholds.
-        if (!empty($thresholds)) {
-            return json_decode($thresholds, true);
+        if (!empty($properties['thresholds'])) {
+            return json_decode($properties['thresholds'], true);
         }
 
         // Generate the default thresholds array.
         $thresholds = array('bystep' => array(), 'total' => array());
         foreach (test_plan_run::$runvars as $var) {
-            $thresholds['bystep'][$var] = $singlestepthreshold;
-            $thresholds['total'][$var] = $groupedthreshold;
+            $thresholds['bystep'][$var] = $properties['singlestepthreshold'];
+            $thresholds['total'][$var] = $properties['groupedthreshold'];
 
         }
 
         return $thresholds;
-    }
-
-    /**
-     * Extracts the property value from $line
-     *
-     * @param string $var
-     * @param string $line
-     * @return string The var value
-     */
-    protected function extract_threshold_value($var, $line) {
-
-        // It can be commented.
-        if (strpos($line, $var . '=') !== 0) {
-            return false;
-        }
-
-        // Just in case an extra conditional as is the user the one that enters the value
-        if (preg_match("/$var='?([^']*)'?/", $line, $matches)) {
-            return $matches[1];
-        }
-
-        return false;
     }
 
     /**
