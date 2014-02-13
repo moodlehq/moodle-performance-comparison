@@ -37,3 +37,13 @@ jmeter_path=/opt/apache-jmeter-2.9
 # Set includelogs="" in case you don't want to include them.
 #
 # includelogs=1
+
+
+## Web interface #######################
+
+# The web interface allows users to perform both read action (compare results,
+# download runs results...) and write actions (delete runs) if you are planning
+# to publish your results but you don't want users to delete your runs set any
+# non-empty value to this setting. By default, the web interface is read & write.
+#
+# readonlyweb=''
