@@ -14,11 +14,7 @@
  *  php detect_big_differences.php 1231231231231 1231231231232 1231231231233
  */
 
-ini_set('display_errors', true);
-ini_set('error_reporting', E_ALL);
-
-require_once(__DIR__ . '/webapp/classes/test_plan_runs.php');
-require_once(__DIR__ . '/webapp/classes/report.php');
+include(__DIR__ . '/webapp/inc.php');
 
 // Removing the script name.
 array_shift($argv);
