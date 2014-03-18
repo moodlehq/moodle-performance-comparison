@@ -58,6 +58,11 @@ class test_plan_run {
 
 
     /**
+     * @var array Average of sums per (users * loopcount).
+     */
+    protected $averagesums = array();
+
+    /**
      * @var array The test steps names.
      */
     protected $steps = array();
@@ -133,6 +138,7 @@ class test_plan_run {
         foreach (self::$runvars as $var) {
             $this->totalsums[$var] = array();
             $this->rawtotals[$var] = array();
+            $this->averagesums[$var] = array();
         }
 
         // Adding all threads info.
@@ -144,14 +150,6 @@ class test_plan_run {
                     $this->steps[] = $stepname;
                 }
 
-                // Init if is empty.
-                if (empty($this->rawtotals[$stepname])) {
-                    $this->rawtotals[$stepname] = array();
-                    foreach (self::$runvars as $key) {
-                        $this->rawtotals[$stepname][$key] = array();
-                    }
-                }
-
                 // Add the thread data to the totals.
                 foreach (self::$runvars as $var) {
 
@@ -161,13 +159,20 @@ class test_plan_run {
                     }
 
                     // Init if is empty (yes, it could be together with the one above).
-                    if (empty($this->rawtotals[$stepname])) {
+                    if (empty($this->rawtotals[$var][$stepname])) {
                         $this->rawtotals[$var][$stepname] = array();
                     }
 
                     $this->totalsums[$var][$stepname] = $this->totalsums[$var][$stepname] + $threadstep[$var];
                     $this->rawtotals[$var][$stepname][] = $threadstep[$var];
                 }
+            }
+        }
+        // Average the sum per (loopcount * users).
+        $averagefactor = $this->rundata->loopcount * $this->rundata->users;
+        foreach (self::$runvars as $var) {
+            foreach ($this->totalsums[$var] as $key => $stepsum) {
+                $this->averagesums[$var][$key] = $stepsum / $averagefactor;
             }
         }
     }
@@ -203,9 +208,11 @@ class test_plan_run {
         if ($var === false) {
             $totalsums = & $this->totalsums;
             $rawtotals = & $this->rawtotals;
+            $averagesums = & $this->averagesums;
         } else {
             $totalsums = & $this->totalsums[$var];
             $rawtotals = & $this->rawtotals[$var];
+            $averagesums = & $this->averagesums[$var];
         }
 
         // Returning just one dataset if it was specified.
@@ -217,7 +224,7 @@ class test_plan_run {
             return $$dataset;
         }
 
-        return array($totalsums, $rawtotals);
+        return array($totalsums, $rawtotals, $averagesums);
     }
 
     /**
