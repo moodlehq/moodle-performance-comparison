@@ -170,6 +170,12 @@ class test_plan_run {
                 }
             }
         }
+        // Average the sum now.
+        foreach (self::$runvars as $var) {
+            foreach ($this->totalsums[$var] as $key => $stepsum) {
+                $this->totalsums[$var][$key] = ceil($stepsum / ($this->rundata->loopcount * $this->rundata->users));
+            }
+        }
     }
 
     /**
