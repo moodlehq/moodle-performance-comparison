@@ -144,11 +144,11 @@ class report {
 
             // TODO: Do something with the raw data.
             $sums = array();
-            $raws = array();
+            $avg = array();
             foreach ($this->runs as $runkey => $run) {
-                list($sum, $raw) = $run->get_run_dataset($var);
+                list($sum, $raw, $average) = $run->get_run_dataset($var);
                 $sums[$runkey] = $sum;
-                $raws[$runkey] = $raw;
+                $avg[$runkey] = $average;
             }
 
             // Getting all the data, ready for step-oriented charts and branch (run) oriented.
@@ -169,7 +169,7 @@ class report {
                 $runorienteddataset[$datasetkey] = array($run->get_run_info_string());
                 // And now we add the multiple runs data.
                 foreach ($genericrun->get_run_steps() as $stepkey => $step) {
-                    $runorienteddataset[$datasetkey][] = $sums[$key][$step];
+                    $runorienteddataset[$datasetkey][] = $avg[$key][$step];
                 }
 
             }
@@ -187,7 +187,7 @@ class report {
                 $steporienteddataset[$datasetkey] = array($step);
                 // And now we add the multiple runs data.
                 foreach ($this->runs as $runkey => $run) {
-                    $steporienteddataset[$datasetkey][] = $sums[$runkey][$step];
+                    $steporienteddataset[$datasetkey][] = $avg[$runkey][$step];
                 }
             }
 
