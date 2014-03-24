@@ -133,13 +133,12 @@ class report {
             // No need to parse anything if it is not comparable.
             return false;
         }
-
         // Will be used to get runs generic data like the steps names, they are supposed to be
         // the same in all the runs, the UI should restrict the comparisons to comparable runs.
         $genericrun = & $this->runs[0];
 
         // Generating the data arrays.
-        $vars = test_plan_run::$runvars;
+        $vars = $this->runs[0]->get_run_var_names();
         foreach ($vars as $var) {
 
             // TODO: Do something with the raw data.
@@ -291,7 +290,7 @@ class report {
 
             $run = & $this->runs[$i];
 
-            $varaggregates = array_fill_keys(test_plan_run::$runvars, 0);
+            $varaggregates = array_fill_keys($run->get_run_var_names(), 0);
 
             $runtotals = $run->get_run_dataset(false, 'totalsums');
             foreach ($runtotals as $var => $steps) {
@@ -478,6 +477,21 @@ class report {
                 if ($values[$var] != $runvalue) {
                     $this->errors[$var] = "You can not compare runs with a different $var value";
                 }
+            }
+        }
+
+        // Run variables can be different for each run, so only compare which has same run variables (dbread, dbwrite..).
+        foreach ($this->runs as $run) {
+
+            $runvars = $run->get_run_var_names();
+
+            // All should have this runval.
+            if (empty($values['runvars'])) {
+                $values['runvars'] = $runvars;
+            }
+
+            if ($values['runvars'] != $runvars) {
+                $this->errors['runvars'] = "You can not compare runs with a different run variables.";
             }
         }
 

@@ -16,6 +16,7 @@
 $PREFIX = array(
     'dbreads' => '',
     'dbwrites' => '',
+    'dbquerytime' => '',
     'memoryused' => ' MB',
     'filesincluded' => '',
     'serverload' => '',
@@ -41,6 +42,7 @@ class page {
     public $starttime = array();
     public $dbreads = array();
     public $dbwrites = array();
+    public $dbquerytime = array();
     public $memoryused = array();
     public $filesincluded = array();
     public $serverload = array();
@@ -476,6 +478,7 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
     $options = array(
         'dbreads' => 'DB reads',
         'dbwrites' => 'DB writes',
+        'dbquerytime' => 'DB query time',
         'filesincluded' => 'Files included',
         'bytes' => 'Bytes',
     );
