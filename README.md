@@ -9,7 +9,7 @@ They can be used to compare:
 * Two different branches performance
 * Different configurations and cache stores configurations
 * Different hardware
-* Web, database and other services tunning
+* Web, database and other services tuning
 * Also works restoring your site sql dumps rather than using the fixed generated dataset, more info in [Using your own sql dump Moodle 2.5 onwards](#using-your-own-sql-dump-moodle-25-onwards) or  [Using your own sql dump (before Moodle 2.5)](#using-your-own-sql-dump-before-moodle-25)
 
 
@@ -19,7 +19,8 @@ They can be used to compare:
 * Fixed data set generation with courses, users, enrolments, module instances... (from Moodle 2.5 onwards)
 * JMeter test plan generation from course contents (from Moodle 2.5 onwards)
 * Web and database warm-up processes included in the test plan (results not collected)
-* JMeter runs gathering results about moodle performance data (database reads/writes, memory usage...)
+* JMeter runs gathering results about moodle performance data (database reads/writes/querytime, memory usage...)
+* Database query time value will differ depending on database and hardware used.
 * Runs results comparison
 
 There are scripts for both the web server and the JMeter server sides.

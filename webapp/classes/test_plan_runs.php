@@ -13,7 +13,8 @@ class test_plan_run {
     /**
      * @var array Vars we can get from the run.
      */
-    public static $runvars = array('dbreads', 'dbwrites', 'memoryused', 'filesincluded', 'serverload', 'sessionsize', 'timeused');
+    public static $runvars = array('dbreads', 'dbwrites', 'dbquerytime', 'memoryused', 'filesincluded', 'serverload',
+            'sessionsize', 'timeused');
 
     /**
      * @var array Params of a run. Not including the description nor timestamp.
@@ -153,6 +154,12 @@ class test_plan_run {
                 // Add the thread data to the totals.
                 foreach (self::$runvars as $var) {
 
+                    if (!isset($threadstep[$var])) {
+                        unset($this->totalsums[$var]);
+                        unset($this->rawtotals[$var]);
+                        unset($this->averagesums[$var]);
+                        continue;
+                    }
                     // Init if is empty.
                     if (empty($this->totalsums[$var][$stepname])) {
                         $this->totalsums[$var][$stepname] = 0;
@@ -171,8 +178,10 @@ class test_plan_run {
         // Average the sum per (loopcount * users).
         $averagefactor = $this->rundata->loopcount * $this->rundata->users;
         foreach (self::$runvars as $var) {
-            foreach ($this->totalsums[$var] as $key => $stepsum) {
-                $this->averagesums[$var][$key] = $stepsum / $averagefactor;
+            if (!empty($this->totalsums[$var])) {
+                foreach ($this->totalsums[$var] as $key => $stepsum) {
+                    $this->averagesums[$var][$key] = $stepsum / $averagefactor;
+                }
             }
         }
     }
@@ -193,6 +202,15 @@ class test_plan_run {
      */
     public function get_run_steps() {
         return $this->steps;
+    }
+
+    /**
+     * Return run variables list.
+     *
+     * @return array
+     */
+    public function get_run_var_names() {
+        return array_keys($this->totalsums);
     }
 
     /**
