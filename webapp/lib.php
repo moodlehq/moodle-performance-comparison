@@ -511,6 +511,7 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
 
     if (!is_dir($path.$subdir)) {
         mkdir($path.$subdir);
+        chmod($path.$subdir, 0775);
     }
 
     $image = imagecreatetruecolor($width, $height);
@@ -677,6 +678,7 @@ function produce_page_graph($field, $beforekey, page $before, $afterkey, page $a
     write_graph_legend($image, $colours, $width, $height);
 
     imagepng($image, $path.$name, 9);
+    chmod($path.$name, 0775);
     return $name;
 }
 
