@@ -26,7 +26,7 @@ readonly SITE_ADMIN_PASSWORD="admin"
 readonly CURRENT_WORKING_DIRECTORY=`pwd`
 readonly FILE_NAME_USERS="$CURRENT_WORKING_DIRECTORY/moodle/testusers.csv"
 readonly FILE_NAME_TEST_PLAN="$CURRENT_WORKING_DIRECTORY/moodle/testplan.jmx"
-readonly PERMISSIONS=777
+readonly PERMISSIONS=775
 
 # Validate the passed size ($1)
 case "$1" in
