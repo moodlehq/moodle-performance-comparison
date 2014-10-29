@@ -59,7 +59,7 @@ delete_files()
     fi
 
     # Kill them all (ok, yes, we don't always require that options).
-    rm -rf "$1"
+    rm -rf $1
 }
 
 ################################################
