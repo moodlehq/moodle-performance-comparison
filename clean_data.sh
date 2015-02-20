@@ -22,11 +22,8 @@ delete_files "runs_samples/*.jtl"
 delete_files "runs_outputs/*.output"
 delete_files "logs/*.log"
 
-# Also images cache.
-sudo delete_files "cache"
-
 # Also backups.
-sudo delete_files "$backupsdir/*"
+delete_files "$backupsdir/*"
 
 # Delete compare files.
 if [ -f "moodle/site_data.properties" ]; then
