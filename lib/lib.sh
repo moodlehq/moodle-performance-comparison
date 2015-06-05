@@ -161,7 +161,7 @@ checkout_branch()
         throw_error "$2 remote can not be fetched. Check webserver_config.properties.dist"
 
     # Checking if it is a branch or a hash.
-    local isareference="$( ${gitcmd} show-ref | grep "refs/remotes/$2/$3" | wc -l )"
+    local isareference="$( ${gitcmd} show-ref | grep "refs/remotes/$2/$3$" | wc -l )"
     if [ "$isareference" == "1" ]; then
 
         # Checkout the last version of the branch.
