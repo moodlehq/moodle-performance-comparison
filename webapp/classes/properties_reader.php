@@ -43,7 +43,7 @@ class properties_reader {
                     foreach ($vars as $var) {
                         $return = self::extract_properties_file_value($var, $line);
                         if ($return && empty($propertiesvalues[$var])) {
-                            $propertiesvalues[$var] = $return;
+                            $propertiesvalues[$var] = preg_replace('/[^0-9\.]/', '', $return);
                         }
                     }
                 }
