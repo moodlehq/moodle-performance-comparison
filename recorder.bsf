@@ -65,7 +65,7 @@ MoodleResult(JMeterContext ctx) {
     }
 
     String sessionsize = "0";
-    Pattern psessionsize = Pattern.compile(".*?Session[^:]*: (\\d+(\\.\\d+)?[A-Z]{2}).*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Pattern psessionsize = Pattern.compile(".*?Session[^:]*: (\\d+(\\.\\d+)?).*", Pattern.UNIX_LINES | Pattern.DOTALL);
     Matcher msessionsize = psessionsize.matcher(html);
     if (msessionsize.matches()) {
         sessionsize = msessionsize.group(1);
@@ -115,6 +115,12 @@ MoodleResult(JMeterContext ctx) {
     }
 
     toPHP() {
+
+       if (sessionsize.indexOf(".") == -1) {
+           // bytes to KB.
+           sessionsize = "0." + sessionsize;
+       }
+
        String php = "$results["+thread+"][] = array(\n";
        php += "    'thread'=>"+thread+",\n";        // Int
        php += "    'starttime'=>"+starttime+",\n";      // Long
