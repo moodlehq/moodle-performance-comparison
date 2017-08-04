@@ -170,6 +170,12 @@ class test_plan_run {
                         $this->rawtotals[$var][$stepname] = array();
                     }
 
+                    if ($var === 'sessionsize') {
+                        // Strip out the KB, MB... part (it is language dependant, so better to strip out
+                        // everything that is not a number of \.).
+                        $threadstep[$var] = preg_replace('/[^0-9\.]/', '', $threadstep[$var]);
+                    }
+
                     $this->totalsums[$var][$stepname] = $this->totalsums[$var][$stepname] + $threadstep[$var];
                     $this->rawtotals[$var][$stepname][] = $threadstep[$var];
                 }
