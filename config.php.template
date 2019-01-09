@@ -14,6 +14,7 @@ $CFG->prefix    = '%%dbprefix%%';
 $CFG->dboptions = array (
   'dbpersist' => 0,
   'dbsocket' => 0,
+  'fetchbuffersize' => 0, // We don't use big data and cursors lead to an excess of dbreads (AUX). Hence, disabling them.
 );
 
 $CFG->wwwroot   = '%%wwwroot%%';
