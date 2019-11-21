@@ -48,7 +48,9 @@ if (!defined('CLI_SCRIPT')) {
     define('MDL_PERFTOFOOT', true);
 }
 
-$CFG->directorypermissions = 0777;#Detect and fix SSL if HTTPS behind an external appliance e.g. a load balancer
+$CFG->directorypermissions = 0777;
+
+#Detect and fix SSL if HTTPS behind an external appliance e.g. a load balancer
 if (isset($_SERVER) && stripos($CFG->wwwroot, 'https://') !== false &&
   (
   isset($_SERVER['HTTP_X_FORWARDED_FOR']) ||
