@@ -28,6 +28,11 @@ readonly FILE_NAME_USERS="$CURRENT_WORKING_DIRECTORY/moodle/testusers.csv"
 readonly FILE_NAME_TEST_PLAN="$CURRENT_WORKING_DIRECTORY/moodle/testplan.jmx"
 readonly PERMISSIONS=775
 
+preservedonotdrop=0
+if [ ! -z "$2" ]; then
+  preservedonotdrop=1
+fi
+
 # Validate the passed size ($1)
 case "$1" in
     'XS')
@@ -56,6 +61,7 @@ Sets up a moodle site with courses and users and generates a JMeter test plan.
 Arguments:
 * $1 => Size, one of the following options: XS, S, M, L, XL, XXL. More than
 'M' is not recommended in development computers.
+* $2 => Set to any value to delete tables from the existing DB; otherwise this script will drop and re-create the DB
 " >&2
         exit 1
 esac
@@ -94,6 +100,7 @@ fi
 if [ "$dbtype" == "pgsql" ]; then
     export PGPASSWORD=${dbpass}
 
+  if [ "$preservedonotdrop" -eq "0" ]; then
     # Checking that the table exists.
     databaseexists="$( ${pgsqlcmd} -h "$dbhost" -U "$dbuser" -l | \
         grep "$dbname" | \
@@ -113,7 +120,26 @@ if [ "$dbtype" == "pgsql" ]; then
         -d template1 \
         -c "CREATE DATABASE $dbname WITH OWNER $dbuser ENCODING 'UTF8'" \
         --quiet
+  else
+      #Drop existing psql tables.
+      sql=$(cat << "EOT"
+      DO $$ DECLARE 
+        r RECORD;
+      BEGIN
+        FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+            EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+        END LOOP;
+      END $$;
+EOT
+  )
 
+  ${pgsqlcmd} \
+      -h "$dbhost" \
+      -d "$dbname" \
+      -U "$dbuser" \
+      -c "$sql" \
+      --quiet
+  fi
 elif [ "$dbtype" == "mysqli" ]; then
 
     # Checking that the table exists.
