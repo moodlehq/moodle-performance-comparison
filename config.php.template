@@ -34,6 +34,11 @@ $CFG->cachetext = 0;
 // debug mode disabled. https://tracker.moodle.org/browse/MDL-41910
 define('LASTACCESS_UPDATE_SECS', 9999999999);
 
+// Some more settings towards results stability.
+$CFG->sessiontimeout = 172800;
+$CFG->session_update_timemodified_frequency = 9999999999;
+$CFG->messaging = 0; // Disable messaging, it's not used with current JMX plan.
+
 // Set the generated users password to avoid the default non-loggeable one.
 $CFG->tool_generator_users_password = '%%toolgeneratorpassword%%';
 
@@ -49,6 +54,8 @@ if (!defined('CLI_SCRIPT')) {
 }
 
 $CFG->directorypermissions = 0777;
+
+$CFG->defaulthomepage = 0; // Our current JMX plan expects this.
 
 require_once(dirname(__FILE__) . '/lib/setup.php');
 
