@@ -72,7 +72,7 @@ MoodleResult(JMeterContext ctx) {
     }
 
     String timeused = "0";
-    Pattern ptimeused = Pattern.compile(".*?\"timeused\">(\\d+(\\.\\d+)?) secs.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Pattern ptimeused = Pattern.compile(".*?\"timeused[^\"]*\">(\\d+(\\.\\d+)?) secs.*", Pattern.UNIX_LINES | Pattern.DOTALL);
     Matcher mtimeused = ptimeused.matcher(html);
     if (mtimeused.matches()) {
         timeused = mtimeused.group(1);
