@@ -115,16 +115,8 @@ class page {
                     $results[$key]['min'] = $value;
                 }
             }
-            $count = count($average);
-            if ($count > 20) {
-                $toremove = floor($count*0.05);
-                sort($average);
-                $average = array_slice($average, $toremove, -$toremove);
-                $count = count($average);
-            }
-            if ($count > 0) {
-                $results[$key]['average'] = round(array_sum($average) / $count, 2);
-            }
+            $results[$key]['average'] = array_sum($average) / count($average);
+            $results[$key]['display'] = round($results[$key]['average'], 2);
         }
 
         return $results;
@@ -153,7 +145,7 @@ class page {
             $count = count($values);
             $valueresult[$value] = array('count' => $count);
             foreach ($PROPERTIES as $PROPERTY) {
-                $valueresult[$value][$PROPERTY] = round(array_sum($result[$PROPERTY][$value])/$count, 1);
+                $valueresult[$value][$PROPERTY] = round(array_sum($result[$PROPERTY][$value])/$count, 2);
             }
         }
 
@@ -245,21 +237,22 @@ function display_organised_results($property, page $before, page $after) {
                 echo "<td style='background-color:#EEE;'>$key ($values[count] hits)</td>";
             } else {
                 if (!empty($propertyaveragesbefore[$key][$p])) {
+                    // Default output values.
+                    $color = '#666';
+                    $dif = '';
+                    // Customize output.
                     $before = $propertyaveragesbefore[$key][$p];
                     $after = $values[$p];
                     $diff = $after - $before;
                     $roundeddiff = abs(round($diff, 2));
-                    if ($diff > 0.1){
+                    if ($diff > 0) {
                         $color = '#83181F';
-                        $diff = "(+$roundeddiff)";
-                    } else if ($diff < 0.1) {
+                        $dif = "(+$roundeddiff)";
+                    } else if ($diff < 0) {
                         $color = '#188327';
-                        $diff = "(-$roundeddiff)";
-                    } else {
-                        $color = '#666';
-                        $diff = '';
+                        $dif = "(-$roundeddiff)";
                     }
-                    echo "<td style='color:$color'>".$after.$PREFIX[$p]." $diff</td>";
+                    echo "<td style='color:$color'>".$after.$PREFIX[$p]." $dif</td>";
                 } else {
                     echo "<td>".$values[$p].$PREFIX[$p]."</td>";
                 }
@@ -292,57 +285,64 @@ function display_results(page $beforepage, page $afterpage) {
     $output .= "<th style='text-align:right;background-color:#eee;'>$beforepage->gitbranch branch (Before) $beforepage->count hits</th>";
     foreach ($PROPERTIES as $PROPERTY) {
         $value = $before[$PROPERTY];
-        $output .= "<td title='Average: $value[average]\nMin: $value[min]\n Max: $value[max]'>$value[average]</td>";
+        $output .= "<td title='Average: $value[average]\nMin: $value[min]\nMax: $value[max]'>$value[display]</td>";
     }
     $output .= "</tr>";
 
     $output .= "<tr>";
     $output .= "<th style='text-align:right;background-color:#eee;'>$afterpage->gitbranch branch (After)  $afterpage->count hits</th>";
     foreach ($PROPERTIES as $PROPERTY) {
+        // Default output values.
+        $color = '#333';
+        $dif = '';
+        // Customize output.
+        $dis = $after[$PROPERTY]['display'];
         $ave = $after[$PROPERTY]['average'];
         $min = $after[$PROPERTY]['min'];
         $max = $after[$PROPERTY]['max'];
         $diff = round($ave - $before[$PROPERTY]['average'],2);
         if ($diff > 0) {
             $color = '#83181F';
-            $diff = " (+$diff)";
+            $dif = " (+$diff)";
         } else if ($diff < 0) {
             $color = '#188327';
-            $diff = " ($diff)";
-        } else {
-            $color = '#333';
-            $diff = '';
+            $dif = " (-$diff)";
         }
-        $output .= "<td style='color:$color;' title='Average: $ave\n Min: $min\n Max: $max'>$ave$diff</td>";
+        $output .= "<td style='color:$color;' title='Average: $ave\nMin: $min\nMax: $max'>$dis$dif</td>";
     }
     $output .= "</tr>";
 
     $output .= "<tr>";
-    $output .= "<th style='text-align:right;background-color:#eee;'>% Improv.</th>";
+    $output .= "<th style='text-align:right;background-color:#eee;'>% Change</th>";
     foreach ($PROPERTIES as $PROPERTY) {
+        // Default output values.
+        $p = "-";
+        $sp = '-';
+        $perc = '&nbsp;';
+        $sign = ' ';
+        $color = '#666';
+        // Customize output.
         $b = $before[$PROPERTY]['average'];
         $a = $after[$PROPERTY]['average'];
         if ($b > 0 && $a > 0) {
-            $p = round(($a / $b) * 100-100, 2);
-            if ($p > 1) {
-                $color = '#83181F;';
+            $p = round((($a / $b) * 100) - 100, 2);
+            if ($p > 0) {
                 $sign = '+';
-            } else if ($p < -1) {
-                $color = '#188327;';
+                if ($p > 1) {
+                    $color = '#83181F;';
+                }
+            } else if ($p < 0) {
                 $sign = '-';
+                if ($p < -1) {
+                    $color = '#188327;';
+                }
             } else {
                 $color = '#666;';
                 $sign = '';
             }
+            $sp = abs($p);
             $p = abs($p)."%";
-            $sp = abs(round($p,1));
             $perc = '%';
-        } else {
-            $p = "-";
-            $sp = '-';
-            $perc = '&nbsp;';
-            $sign = ' ';
-            $color = '#666';
         }
 
         $stats .= "<div class='statsbox $PROPERTY'>";
@@ -350,7 +350,7 @@ function display_results(page $beforepage, page $afterpage) {
         $stats .= "<p style='color:$color'>$sign$sp<span class='perc'>$perc</span></p>";
         $stats .= "</div>";
 
-        $output .= "<td style='color:$color;font-weight:bold;'>$p</td>";
+        $output .= "<td style='color:$color;font-weight:bold;'>$sign$p</td>";
     }
     $output .= "</tr>";
 
@@ -439,7 +439,7 @@ function get_runs($dir = null) {
     return $runs;
 }
 
-function display_run_selector(array $runs, $before=null, $after=null, array $params = array(), $organiseby = 'filesincluded', $mostcommononly = false) {
+function display_run_selector(array $runs, $before=null, $after=null, array $params = array(), $organiseby = 'filesincluded', $mostcommononly = false, $normalize = false) {
     echo "<div class='runselector'>";
     echo "<form method='get' action=''>";
     foreach ($params as $key => $value) {
@@ -494,7 +494,9 @@ function display_run_selector(array $runs, $before=null, $after=null, array $par
     echo "<br />";
     echo "<input type='submit' value='Load' />";
     echo "</form>";
-    echo "<p>You can also change the width and height of the graphs by adding w=newwidth and h=newheight to the url.</p>";
+    echo "<p>You can change the width and height of the graphs by adding w=newwidth and h=newheight to the url.</p>";
+    echo "<p>Also, adding 'n=1|true' to the url, you will get normalized results of outliers.<br/>";
+    echo "(Normalization is " . ($normalize ? "ENABLED" : "DISABLED") . " now)</p>";
     echo "</div>";
 }
 
@@ -714,7 +716,7 @@ function get_font() {
     return $BASEDIR.'/webapp/DejaVuSans.ttf';
 }
 
-function build_pages_array(array $runs, $before, $after) {
+function build_pages_array(array $runs, $before, $after, $normalize = false) {
     global $PROPERTIES;
 
     $pages = array();
@@ -737,6 +739,15 @@ function build_pages_array(array $runs, $before, $after) {
         }
     }
 
+    // We may see normalized information, let's do it.
+    if ($normalize) {
+        foreach ($pages as $key => $page) {
+            foreach ($PROPERTIES as $property) {
+                normalize_outliners_in_array($pages[$key]['before']->$property);
+            }
+        }
+    }
+
     $results = array();
     include($runs[$after]['file']);
     foreach ($results as $thread) {
@@ -749,6 +760,15 @@ function build_pages_array(array $runs, $before, $after) {
                 $pages[$key]['after'] = new page($page['url'], $page['name'], 'unknown');
             }
             $pages[$key]['after']->from_result($page);
+        }
+    }
+
+    // We may see normalized information, let's do it.
+    if ($normalize) {
+        foreach ($pages as $key => $page) {
+            foreach ($PROPERTIES as $property) {
+                normalize_outliners_in_array($pages[$key]['after']->$property);
+            }
         }
     }
 
@@ -780,4 +800,96 @@ function build_pages_array(array $runs, $before, $after) {
 
     $pages['combined'] = $combined;
     return $pages;
+}
+
+/**
+ * Given an array of values, modify it returning all outliers normalized
+ *
+ * @param array values which outliers we are going to normalize
+ */
+function normalize_outliners_in_array(array &$values): void {
+    // Calculate the estadistics we need.
+    list($lower, $upper) = calculate_outlier_limits($values);
+    $avg = array_sum($values) / count($values);
+    $pseudoavg = ($lower === $upper) ? $lower : $avg;
+    // Iterate over the array, updating outliers by pseudo average.
+    foreach($values as $key => $value) {
+        if ($value < $lower || $value > $upper) {
+            $values[$key] = $pseudoavg;
+        }
+    }
+}
+
+/**
+ * Return the lower and upper values beyong which values will be considered outliers.
+ *
+ * Going to use the 1.5xIQR rule here that is good enough
+ * and not so avg-dependent like the 3*SD one. It doen't
+ * matter much, really. I'm not inventing anything.
+ * Ref: https://bit.ly/2UCSlvi
+ *
+ * @param array $values array of values to find outlier limits.
+ * @return array lower and upper outlier limits.
+ */
+function calculate_outlier_limits(array $values): array {
+    // Calculate all quartiles.
+    $quartiles = quartiles($values);
+    // Calculate IQR.
+    $iqr = $quartiles[3] - $quartiles[1];
+    // Lower and upper.
+    $lower = $quartiles[1] - ($iqr * 1.5);
+    $upper = $quartiles[3] + ($iqr * 1.5);
+
+    return [$lower, $upper];
+}
+
+/**
+ * Calculate all quartiles
+ *
+ * @param array $values array of values to calculate the quartiles
+ * @return array containing quartiles 0-4
+ */
+function quartiles(array $values): array {
+    // We need the values to be sorted and counted.
+    sort($values);
+    $count = count($values);
+
+    $q = [];
+
+    $q[0] = min($values);
+    $q[2] = median($values);
+    $q[4] = max($values);
+
+    if ($count % 2 !== 0) {
+        unset($values[round($count / 2)]);
+        $count--;
+    }
+
+    $split = array_chunk($values, $count / 2);
+
+    $q[1] = median($split[0]);
+    $q[3] = median($split[1]);
+
+    return $q;
+}
+
+/**
+ * Calculate the median of an array of numeric values
+ *
+ * @param array $values array of values to calculate the median
+ * @return float the median
+ */
+function median(array $values): float {
+    // We need the values to be sorted and counted.
+    sort($values);
+    $count = count($values);
+
+    $i = round($count / 2) - 1;
+    if ($count % 2 !== 0) {
+        $m = $values[$i];
+    } else {
+        $m = ($values[$i] + $values[$i + 1]) / 2;
+    }
+
+    return $m;
 }

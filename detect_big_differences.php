@@ -15,9 +15,20 @@
  */
 
 include(__DIR__ . '/webapp/inc.php');
+include(__DIR__ . '/webapp/lib.php');
+
+$normalize = false;
 
 // Removing the script name.
 array_shift($argv);
+
+// Look for the --outliers flag in order to normalize.
+foreach ($argv as $key => $arg) {
+    if ($arg == '--outliers' || substr($arg, 0, 9) == '--normali') {
+        $normalize = true;
+        unset($argv[$key]);
+    }
+}
 
 if (empty($argv)) {
     echo 'Error: You need to specify the runs filenames without their .php sufix.' . PHP_EOL;
@@ -33,7 +44,7 @@ if (count($argv) == 1) {
 $timestamps = $argv;
 
 $report = new report();
-if (!$report->parse_runs($timestamps)) {
+if (!$report->parse_runs($timestamps, $normalize)) {
     echo 'Error: The selected runs are not comparable.' . PHP_EOL;
     foreach ($report->get_errors() as $var => $error) {
         echo $var . ': ' . $error . PHP_EOL;
@@ -52,10 +63,15 @@ $branches = $report->get_big_differences();
 $exitcode = 0;
 if ($branches) {
     foreach ($branches as $branchnames => $changes) {
+        if (!empty($changes)) {
+            echo "$branchnames" . PHP_EOL;
+        }
         foreach ($changes as $state => $data) {
             foreach ($data as $var => $steps) {
                 foreach ($steps as $stepname => $info) {
-                    echo "$branchnames - $state: $var - $stepname -> $info" . PHP_EOL;
+                    $normalizestr = $normalize ? '(Normalized) ' : '';
+                    echo $normalizestr;
+                    echo "- $state: $var - $stepname -> $info" . PHP_EOL;
                 }
             }
         }

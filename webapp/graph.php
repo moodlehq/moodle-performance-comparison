@@ -20,6 +20,7 @@ $before = null;
 $after = null;
 $width = '800';
 $height = '600';
+$normalize = false;
 if (!empty($_GET['before']) && array_key_exists($_GET['before'], $runs)) {
     $before = $_GET['before'];
     $beforekey = array_search($before, $runs);
@@ -37,10 +38,13 @@ if (!empty($_GET['w']) && preg_match('/^\d+$/', $_GET['w'])) {
 if (!empty($_GET['h']) && preg_match('/^\d+$/', $_GET['h'])) {
     $height = (int)$_GET['h'];
 }
+if (!empty($_GET['n']) && preg_match('/^(0|1|true|false)$/', $_GET['n'])) {
+    $normalize = (bool)$_GET['n'];
+}
 
 $pages = array();
 if ($before && $after) {
-    $pages = build_pages_array($runs, $before, $after);
+    $pages = build_pages_array($runs, $before, $after, $normalize);
 }
 
 if (isset($_GET['page']) && array_key_exists($_GET['page'], $pages)) {
@@ -48,5 +52,8 @@ if (isset($_GET['page']) && array_key_exists($_GET['page'], $pages)) {
 }
 
 echo "<html><head></head><body style='margin:0;padding:0;text-align:center;'>";
-echo "<img src='./cache/".produce_page_graph($property, $beforekey, $page['before'], $afterkey, $page['after'], $width, $height)."' alt='$property' style='width:{$width}px;height:{$height}px;' />";
+echo "<img src='../cache/" .
+    produce_page_graph($property, $beforekey, $page['before'], $afterkey, $page['after'],
+        $width, $height, array('n' => $normalize)) .
+    "' alt='$property' style='width:{$width}px;height:{$height}px;' />";
 echo "</body></html>";

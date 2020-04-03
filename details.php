@@ -22,6 +22,7 @@ $width = '300';
 $height = '150';
 $organiseby = 'filesincluded';
 $mostcommononly = false;
+$normalize = false;
 if (!empty($_GET['before']) && array_key_exists($_GET['before'], $runs)) {
     $before = $_GET['before'];
 }
@@ -40,21 +41,28 @@ if (!empty($_GET['o']) && preg_match('/^[a-z]+$/', $_GET['o'])) {
 if (!empty($_GET['x']) && preg_match('/^(0|1|true|false)$/', $_GET['x'])) {
     $mostcommononly = (bool)$_GET['x'];
 }
+if (!empty($_GET['n']) && preg_match('/^(0|1|true|false)$/', $_GET['n'])) {
+    $normalize = (bool)$_GET['n'];
+}
 
 $pages = array();
 if ($before && $after) {
-    $pages = build_pages_array($runs, $before, $after);
+    $pages = build_pages_array($runs, $before, $after, $normalize);
 }
 
 echo "<html>";
 echo "<head>";
-echo '<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.3.0/build/yui/yui-min.js&3.3.0/build/oop/oop-min.js&3.3.0/build/event-custom/event-custom-base-min.js&3.3.0/build/event/event-base-min.js&3.3.0/build/dom/dom-base-min.js&3.3.0/build/dom/selector-native-min.js&3.3.0/build/dom/selector-css2-min.js&3.3.0/build/node/node-base-min.js&3.3.0/build/event/event-base-ie-min.js&3.3.0/build/event-custom/event-custom-complex-min.js&3.3.0/build/event/event-synthetic-min.js&3.3.0/build/event/event-hover-min.js&3.3.0/build/dom/dom-style-min.js&3.3.0/build/dom/dom-style-ie-min.js&3.3.0/build/node/node-style-min.js"></script>';
+$httpyuilib = 'http://yui.yahooapis.com';
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+    $httpyuilib = 'https://yui-s.yahooapis.com';
+}
+echo '<script type="text/javascript" src="' . $httpyuilib . '/combo?3.3.0/build/yui/yui-min.js&3.3.0/build/oop/oop-min.js&3.3.0/build/event-custom/event-custom-base-min.js&3.3.0/build/event/event-base-min.js&3.3.0/build/dom/dom-base-min.js&3.3.0/build/dom/selector-native-min.js&3.3.0/build/dom/selector-css2-min.js&3.3.0/build/node/node-base-min.js&3.3.0/build/event/event-base-ie-min.js&3.3.0/build/event-custom/event-custom-complex-min.js&3.3.0/build/event/event-synthetic-min.js&3.3.0/build/event/event-hover-min.js&3.3.0/build/dom/dom-style-min.js&3.3.0/build/dom/dom-style-ie-min.js&3.3.0/build/node/node-style-min.js"></script>';
 echo '<link rel="stylesheet" type="text/css" href="webapp/jmeter.css" />';
 echo "<script type='text/javascript' src='webapp/jmeter.js'></script>";
 echo "</head>";
 echo "<body>";
 
-display_run_selector($runs, $before, $after, array('w' => $width, 'h' => $height), $organiseby, $mostcommononly);
+display_run_selector($runs, $before, $after, array('w' => $width, 'h' => $height), $organiseby, $mostcommononly, $normalize);
 
 if ($before && $after) {
     $count = 0;
@@ -87,8 +95,8 @@ if ($before && $after) {
             if (!property_exists($page['before'], $PROPERTY)) {
                 continue;
             }
-            $graphfile = produce_page_graph($PROPERTY, $before, $page['before'], $after, $page['after'], $width, $height, array('x' => $mostcommononly));
-            echo "<a href='webapp/graph.php?before=$before&after=$after&property=$PROPERTY&page=$key' class='largegraph'>";
+            $graphfile = produce_page_graph($PROPERTY, $before, $page['before'], $after, $page['after'], $width, $height, array('x' => $mostcommononly, 'n' => $normalize));
+            echo "<a href='webapp/graph.php?before=$before&after=$after&property=$PROPERTY&page=$key&n=$normalize' class='largegraph'>";
             echo "<img src='./cache/".$graphfile."' alt='$PROPERTY' style='width:{$width}px;height:{$height}px;' />";
             echo "</a>";
         }
