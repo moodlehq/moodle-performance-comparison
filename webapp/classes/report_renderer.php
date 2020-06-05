@@ -27,9 +27,11 @@ class report_renderer {
     /**
      * Outputs wrapper.
      *
+     * @param bool $normalize are we calculating normalized results
+     *
      * @return void
      */
-    public function render() {
+    public function render($normalize = false) {
         echo $this->output_head();
 
         echo $this->output_form();
@@ -40,10 +42,9 @@ class report_renderer {
         // Link to Sam's tool with detailed data (just the first 2 runs).
         if (!empty($_GET['timestamps']) && count($_GET['timestamps']) >= 2) {
             $urlparams = 'before=' . $_GET['timestamps'][1] . '&after=' . $_GET['timestamps'][0];
+            $urlparams .= $normalize ? '&n=1' : '';
             echo '<div class="switchtool"><a href="details.php?' . $urlparams . '" target="_blank">See numeric info</a></div>';
         }
-
-
     }
 
     /**
@@ -149,6 +150,14 @@ class report_renderer {
         }
 
         $runsselect .= '<br/><br/><input type="submit" value="View comparison"/>';
+        // Allow to select normalize here.
+        $normalize = false;
+        if (!empty($_GET['n']) && preg_match('/^(0|1|true|false)$/', $_GET['n'])) {
+            $normalize = (bool)$_GET['n'];
+        }
+        $checked = $normalize ? ' checked' : '';
+        $runsselect .= '&nbsp;<input type="checkbox" id="normalize" name="n" value="1"'. $checked . '>' .
+            '<label for="normalize">Normalize outlier samples</label>';
         $output .= $this->create_table('Select runs', array($runsselect), 1);
         $output .= '</form>';
 

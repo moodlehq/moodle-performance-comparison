@@ -74,8 +74,77 @@ class test_plan_run {
      * @param int $timestamp
      * @return void
      */
-    public function __construct($timestamp) {
+    public function __construct($timestamp, $normalize = false) {
         $this->rundata = $this->include_run($timestamp);
+
+        // If we want to normalize data, go for it. Basically it
+        // will get clear - really extreme - outliers and change
+        // and replace them by the avg value, so they don't
+        // cause any distorsion when comparing totals and/or averages.
+        //
+        // Note that other outliner detection may have been used,
+        // directly removing them... before analysis, but given
+        // how this class calculates totals and averages...
+        // see parse_results(), we must keep them within the rundata,
+        if ($normalize) {
+            $this->rundata = $this->normalize();
+        }
+    }
+
+    /**
+     * Outliner detection and replacement function.
+     *
+     * Use this to find all the outliners (by step and variable)
+     * present in rundata. And normalize them to be the average
+     * value, so they don't introduce distorsions when looking
+     * for changes anymore.
+     */
+    private function normalize() {
+        // Let's get all the values.
+        $runvalues = [];
+        foreach ($this->rundata->results as $thread) {
+            foreach ($thread as $threadstep) {
+                $stepname = trim($threadstep['name']);
+                if (!isset($runvalues[$stepname])) {
+                    $runvalues[$stepname] = [];
+                }
+                foreach (self::$runvars as $var) {
+                    if (!isset($runvalues[$stepname][$var])) {
+                        $runvalues[$stepname][$var] = [];
+                    }
+                    $runvalues[$stepname][$var][] = $threadstep[$var];
+                }
+            }
+        }
+        // Now, for each step and variable, calculate their outlier limits.
+        $statvalues = [];
+        foreach ($runvalues as $stepname => $runvalues) {
+            $statvalues[$stepname] = [];
+            foreach ($runvalues as $runvar => $values) {
+                $statvalues[$stepname][$runvar] = new stdClass();
+                list($lower, $upper) = calculate_outlier_limits($values);
+                $avg = array_sum($values) / count($values);
+                $statvalues[$stepname][$runvar]->lower = $lower;
+                $statvalues[$stepname][$runvar]->upper = $upper;
+                $statvalues[$stepname][$runvar]->pseudoavg = ($lower === $upper) ? $lower : $avg;
+            }
+        }
+        // Let's apply the outlier limits to all the rundata, normalizing them to pseudoavg
+        // to avoid them to keep disturbing.
+        foreach ($this->rundata->results as $threadkey => $thread) {
+            foreach ($thread as $threadstepkey => $threadstep) {
+                $stepname = trim($threadstep['name']);
+                foreach (self::$runvars as $runvar) {
+                    $value = $this->rundata->results[$threadkey][$threadstepkey][$runvar];
+                    // If the value is beyond limits, apply pseudoavg to the original rundata.
+                    if ($value < $statvalues[$stepname][$runvar]->lower || $value > $statvalues[$stepname][$runvar]->upper) {
+                        $this->rundata->results[$threadkey][$threadstepkey][$runvar] = $statvalues[$stepname][$runvar]->pseudoavg;
+                    }
+                }
+            }
+        }
+
+        return $this->rundata;
     }
 
     /**

@@ -93,9 +93,10 @@ class report {
      * Gets the runs data
      *
      * @param array $timestamps We will get the runs files from their timestamp (is part of the name).
+     * @param bool $normalize We want to normalize clear outliers.
      * @return bool Whether runs are comparable or not.
      */
-    public function parse_runs(array $timestamps) {
+    public function parse_runs(array $timestamps, bool $normalize = false) {
 
         foreach ($timestamps as $timestamp) {
 
@@ -104,7 +105,7 @@ class report {
             }
 
             // Creating the run object and parsing it.
-            $run = new test_plan_run($timestamp);
+            $run = new test_plan_run($timestamp, $normalize);
             $run->parse_results();
             $this->runs[] = $run;
         }
@@ -121,15 +122,16 @@ class report {
      * Generates the report
      *
      * @param array $timestamps We will get the runs files from their timestamp (is part of the name).
+     * @param bool $normalize We want to normalize clear outliers.
      * @return bool False if problems were found.
      */
-    public function make(array $timestamps) {
+    public function make(array $timestamps, $normalize = false) {
 
         // They come from the form in the opposite order.
         krsort($timestamps);
 
         // Gets the runs data and checks that it is comparable.
-        if (!$this->parse_runs($timestamps)) {
+        if (!$this->parse_runs($timestamps, $normalize)) {
             // No need to parse anything if it is not comparable.
             return false;
         }
@@ -293,6 +295,7 @@ class report {
             $varaggregates = array_fill_keys($run->get_run_var_names(), 0);
 
             $runtotals = $run->get_run_dataset(false, 'totalsums');
+
             foreach ($runtotals as $var => $steps) {
 
                 $branchnames = 'between ' . $baserun->get_run_info_string() . ' and ' . $run->get_run_info_string();
@@ -412,7 +415,7 @@ class report {
         }
 
         if (($difference - $threshold) > 100) {
-            return array('increment', $change . '% worst');
+            return array('increment', $change . '% worse');
         } else if (($difference + $threshold) < 100) {
             return array('decrease', $change . '% better');
         }

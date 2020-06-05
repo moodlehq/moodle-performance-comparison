@@ -44,5 +44,5 @@ a img {border:0;}
 
 #lightbox {width:100%;height:100%;position:fixed;top:0;left:0;background-color:#000;opacity:0.7;z-index:10000;}
 #overlay {position:fixed;top:0;left:0;width:100%;height:100%;z-index:20000;}
-#overlay iframe {width:60%;height:600px;margin:100px 20% 0;border-color:#FFF;border-style:solid;background-color:#FFF;}
-#overlay .close {background-color:#FFF;text-align:right;color:#aaa;font-weight:bold;text-transform:uppercase;width:60%;margin:0 20%;border:2px solid #FFF;cursor:pointer;}
+#overlay iframe {width:80%;height:600px;margin:100px 10%;border-color:#FFF;border-style:solid;background-color:#FFF;}
+#overlay .close {background-color:#FFF;text-align:right;color:#aaa;font-weight:bold;text-transform:uppercase;width:80%;margin:-100px 10%;border:2px solid #FFF;cursor:pointer;}
