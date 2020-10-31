@@ -5,9 +5,9 @@ require_once(__DIR__ . '/webapp/lib.php');
 
 $report = new report();
 
+$normalize = false;
 if (!empty($_GET['timestamps'])) {
 
-    $normalize = false;
     if (!empty($_GET['n']) && preg_match('/^(0|1|true|false)$/', $_GET['n'])) {
         $normalize = (bool)$_GET['n'];
     }
