@@ -217,7 +217,13 @@ class report {
 
                 // We only want the run files that are ready.
                 if ($filename != '.' && $filename != '..' &&
-                        $filename != 'empty' && $filename != 'tmpfilename.php') {
+                    $filename != 'empty' && $filename != 'tmpfilename.php') {
+
+                    // Verify the file is ok.
+                    $line = fgets(fopen("$dir/$filename", 'r'));
+                    if (strpos($line, '<?php') !== 0) {
+                        continue;
+                    }
 
                     $timestamp = preg_replace("/[^0-9]/","", $filename);
                     $runfiles[$timestamp] = new test_plan_run($timestamp);
