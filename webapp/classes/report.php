@@ -323,8 +323,6 @@ class report {
 
                     list($state, $msg) = $changed;
 
-                    // We unset all the steps to avoid showing too much info with a general increase / decrease is ok.
-                    $this->bigdifferences[$branchnames][$state][$var] = array();
                     $this->bigdifferences[$branchnames][$state][$var]['All steps data combined'] = $msg;
                 }
             }
