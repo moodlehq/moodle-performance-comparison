@@ -144,8 +144,9 @@ Press [q] to stop the script or, if you have already done it, any other key to c
 fi
 
 # Upgrading moodle, although we are not sure that before and after branches are different.
-echo "Upgrading Moodle ($basecommit) to $afterbranch"
+echo "Checking out Moodle from repo: $afterbranchrepository, ref: $afterbranch"
 checkout_branch $afterbranchrepository 'after' $afterbranch
+echo "Upgrading Moodle ($basecommit) to $(git rev-parse after/$afterbranch)"
 ${phpcmd} admin/cli/upgrade.php --non-interactive --allow-unstable > /dev/null || \
     throw_error "Moodle can not be upgraded to $afterbranch"
 

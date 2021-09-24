@@ -289,8 +289,9 @@ echo "$generatedfiles" > "$CURRENT_WORKING_DIRECTORY/test_files.properties" || \
     throw_error "$errorstr"
 
 # Upgrading moodle, although we are not sure that base and before branch are different.
-echo "Upgrading Moodle ($basecommit) to $beforebranch"
+echo "Checking out Moodle from repo: $beforebranchrepository, ref: $beforebranch"
 checkout_branch $beforebranchrepository 'before' $beforebranch
+echo "Upgrading Moodle ($basecommit) to $(git rev-parse before/$beforebranch)"
 ${phpcmd} admin/cli/upgrade.php \
     --non-interactive \
     --allow-unstable \
