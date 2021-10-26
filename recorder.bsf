@@ -44,7 +44,7 @@ MoodleResult(JMeterContext ctx) {
     }
 
     String memoryused = "0";
-    Pattern pmemoryused = Pattern.compile(".*?RAM: (\\d+(\\.\\d+)?)MB.*", Pattern.UNIX_LINES | Pattern.DOTALL);
+    Pattern pmemoryused = Pattern.compile(".*?RAM: (\\d+(\\.\\d+)?)[^M]*MB.*", Pattern.UNIX_LINES | Pattern.DOTALL);
     Matcher mmemoryused = pmemoryused.matcher(html);
     if (mmemoryused.matches()) {
         memoryused = mmemoryused.group(1);
