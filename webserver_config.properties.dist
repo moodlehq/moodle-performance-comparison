@@ -26,7 +26,7 @@ toolgeneratorpassword="moodlerules"
 ## Repository and test branches information ##################
 
 # The moodle repository where the base branch is located.
-repository="git://github.com/moodle/moodle.git"
+repository="https://github.com/moodle/moodle.git"
 
 # The base where both before and after branches will be updated.
 # This is necessary in case there are changes in
@@ -64,13 +64,13 @@ basecommit="500c131eb49771e36f68d151dfa37fef5a9bc2df"
 
 # The original branch.
 # Usually one of Moodle's weekly released branches. You can also use a git hash here.
-beforebranchrepository="git://github.com/moodle/moodle.git"
+beforebranchrepository="https://github.com/moodle/moodle.git"
 beforebranch="master"
 
 # The branch to compare against.
 # Usually your development branch or the same $beforebranch value if
 # you are comparing different settings configurations. You can also use a git hash here.
-afterbranchrepository="git://github.com/moodle/moodle.git"
+afterbranchrepository="https://github.com/moodle/moodle.git"
 afterbranch="master"
 
 

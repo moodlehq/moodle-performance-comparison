@@ -21,7 +21,7 @@ moodle-performance-comparison tool uses both bash scripts and PHP scripts, needs
 ## Installing the tool
 
 ### Source code
-  * Not much to say here, we recommend *git clone git://github.com/moodlehq/moodle-performance-comparison.git* otherwise you can just download the ZIP for the branch you want to use
+  * Not much to say here, we recommend *git clone https://github.com/moodlehq/moodle-performance-comparison.git* otherwise you can just download the ZIP for the branch you want to use
   * The only changes between the project branches are the default hashes proposed in *webserver_config.properties.dist*
   * Remember that this tool is not intended to be used in public servers and there are serious security risks doing it
 
