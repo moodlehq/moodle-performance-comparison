@@ -39,7 +39,7 @@ repository="https://github.com/moodle/moodle.git"
 # This is Moodle 4.2 (Build: 20230424) - 2023042400.00
 basecommit="ae4efa96ee8169a848c141ad21690165ea791552"
 # This is Moodle 4.1 (Build: 20221128) - 2022112800.00
-basecommit="0ea3d45e04c3d54a3a472ddcb11606b30e227c50"
+#basecommit="0ea3d45e04c3d54a3a472ddcb11606b30e227c50"
 # This is Moodle 4.0 (Build: 20220419) - 2022041900.00
 #basecommit="8b359ad7a63cf219110bca80552fe3d4ea2a635d"
 # This is Moodle 3.11 (Build: 20210517) - 2021051700.00
