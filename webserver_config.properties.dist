@@ -77,13 +77,13 @@ basecommit="fe7aff8093240cc373f1ddaa66ecb91c4bc0a09f"
 # The original branch.
 # Usually one of Moodle's weekly released branches. You can also use a git hash here.
 beforebranchrepository="https://github.com/moodle/moodle.git"
-beforebranch="master"
+beforebranch="main"
 
 # The branch to compare against.
 # Usually your development branch or the same $beforebranch value if
 # you are comparing different settings configurations. You can also use a git hash here.
 afterbranchrepository="https://github.com/moodle/moodle.git"
-afterbranch="master"
+afterbranch="main"
 
 
 ## Others ####################################################

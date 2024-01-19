@@ -136,7 +136,7 @@ class report_renderer {
 
         // Add a message if there are no runs.
         if (!$runs) {
-            $link = 'https://github.com/moodlehq/moodle-performance-comparison/blob/master/README.md#usage';
+            $link = 'https://github.com/moodlehq/moodle-performance-comparison/blob/main/README.md#usage';
             $runsselect .= '<br/><br/>There are no runs, more info in <a href="' . $link . '" target="_blank">' . $link . '</a>';
         }
 
