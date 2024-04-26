@@ -136,7 +136,7 @@ else
 fi
 
 # Uses the test plan specified in the CLI call.
-datestring=`date '+%Y%m%d%H%M'`
+datestring=`date '+%Y%m%d%H%M%S'`
 logfile="logs/jmeter.$datestring.log"
 runoutput="runs_outputs/$datestring.output"
 
