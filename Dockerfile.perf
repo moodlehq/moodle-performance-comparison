@@ -1,0 +1,27 @@
+FROM ubuntu:latest
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    git \
+    curl \
+    php \
+    openjdk-11-jre \
+    apache2 \
+    && apt-get clean
+
+# Clone the Moodle Performance Comparison repository
+RUN git clone https://github.com/moodlehq/moodle-performance-comparison.git /var/www/html/moodle-performance-comparison
+
+# Set working directory
+WORKDIR /var/www/html/moodle-performance-comparison
+RUN cp webserver_config.properties.dist webserver_config.properties
+
+# Configure the tool in the web server container (user should edit manually or via environment variables)
+# We don't configure jmeter_config.properties here since JMeter is in a separate container
+
+# Expose the container's Apache port
+EXPOSE 80
+
+# Start Apache properly
+CMD ["apachectl", "-D", "FOREGROUND"]

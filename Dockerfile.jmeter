@@ -1,0 +1,32 @@
+FROM ubuntu:20.04
+
+# Set environment variables
+ENV JMETER_VERSION 2.11
+ENV JMETER_HOME /opt/apache-jmeter-${JMETER_VERSION}
+ENV PATH $JMETER_HOME/bin:$PATH
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    openjdk-11-jre \
+    wget \
+    unzip \
+    && apt-get clean
+
+# Download and extract JMeter
+RUN wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.zip -O /tmp/apache-jmeter.zip && \
+    unzip /tmp/apache-jmeter.zip -d /opt && \
+    rm /tmp/apache-jmeter.zip
+
+# Fix permissions for the JMeter scripts
+RUN chmod +x $JMETER_HOME/bin/*.sh
+
+# Set working directory
+WORKDIR $JMETER_HOME
+
+# Expose ports if needed (e.g., JMeter server mode, if applicable)
+EXPOSE 1099 60000
+
+# Command to run JMeter (update the path to the test plan and results file)
+CMD ["sh", "-c", "bin/jmeter.sh -n -t /path/to/test.jmx -l /path/to/results.jtl"]
+
